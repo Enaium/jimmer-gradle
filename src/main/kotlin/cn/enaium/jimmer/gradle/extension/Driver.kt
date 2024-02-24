@@ -21,6 +21,6 @@ package cn.enaium.jimmer.gradle.extension
  */
 enum class Driver(val className: String, val module: String) {
     POSTGRESQL("org.postgresql.Driver", "postgresql"),
-//    MARIADB("org.mariadb.jdbc.Driver", "mariadb"),
-//    MYSQL("com.mysql.cj.jdbc.Driver", "mysql"),
+    MARIADB("org.mariadb.jdbc.Driver", "mariadb"),
+    MYSQL("com.mysql.cj.jdbc.Driver", "mysql"),
 }

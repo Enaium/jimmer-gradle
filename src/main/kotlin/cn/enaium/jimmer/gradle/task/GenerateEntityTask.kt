@@ -51,7 +51,8 @@ open class GenerateEntityTask : DefaultTask() {
             ?: throw RuntimeException("Failed to find driver module")
         DriverManager.registerDriver(
             DiverWrapper(
-                Class.forName(generator.jdbc.driver.get().className, true, classloader).newInstance() as Driver
+                Class.forName(generator.jdbc.driver.get().className, true, classloader).getConstructor()
+                    .newInstance() as Driver
             )
         )
 

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "cn.enaium"
-version = "0.0.2"
+version = "0.0.3"
 
 repositories {
     mavenCentral()
@@ -18,8 +18,10 @@ dependencies {
     implementation("org.babyfish.jimmer:jimmer-core:${property("jimmer")}")
     testImplementation("org.testcontainers:postgresql:${property("testcontainers")}")
     testImplementation("org.testcontainers:mariadb:${property("testcontainers")}")
+    testImplementation("org.testcontainers:mysql:${property("testcontainers")}")
     testImplementation("org.postgresql:postgresql:${property("postgresql")}")
     testImplementation("org.mariadb.jdbc:mariadb-java-client:${property("mariadb")}")
+    testImplementation("com.mysql:mysql-connector-j:${property("mysql")}")
     testImplementation(kotlin("test"))
 }
 

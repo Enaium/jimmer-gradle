@@ -3,10 +3,14 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square)
 ![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square)
 
+![Static Badge](https://img.shields.io/badge/-PostgreSQL-gray?style=flat-square&logo=postgresql)
+![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb)
+![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql)
+
 
 ## generate entity
 
-Current only support PostgreSQL and generate kotlin entity.
+Current only support generate kotlin entity.
 
 ```kotlin
 import cn.enaium.jimmer.gradle.extension.Driver

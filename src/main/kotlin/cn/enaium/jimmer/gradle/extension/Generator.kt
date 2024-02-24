@@ -29,7 +29,7 @@ open class Generator @Inject constructor(objects: ObjectFactory) {
     internal val jdbc: JDBC = objects.newInstance(JDBC::class.java)
     internal val optional: Optional = objects.newInstance(Optional::class.java)
     val typeMappings: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
-    internal val poet: cn.enaium.jimmer.gradle.extension.Poet = objects.newInstance(cn.enaium.jimmer.gradle.extension.Poet::class.java)
+    internal val poet: Poet = objects.newInstance(Poet::class.java)
 
 
     fun environment(action: Action<Environment>) {
@@ -44,7 +44,7 @@ open class Generator @Inject constructor(objects: ObjectFactory) {
         action.execute(optional)
     }
 
-    fun poet(action: Action<cn.enaium.jimmer.gradle.extension.Poet>) {
+    fun poet(action: Action<Poet>) {
         action.execute(poet)
     }
 }

@@ -21,14 +21,14 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.MySQLContainer
 import java.sql.DriverManager
 import kotlin.test.assertEquals
 
 /**
  * @author Enaium
  */
-class PostgresGeneratorTest : ProjectTest() {
+class MySQLGeneratorTest : ProjectTest() {
     override fun name(): String {
         return "kotlinGenerator"
     }
@@ -38,37 +38,39 @@ class PostgresGeneratorTest : ProjectTest() {
         val create = create(
             "generateEntity",
             mapOf(
-                "url" to postgres.jdbcUrl,
-                "username" to postgres.username,
-                "password" to postgres.password,
-                "driver" to "POSTGRESQL",
-                "driverDependency" to "org.postgresql:postgresql:42.6.0"
+                "url" to mysql.jdbcUrl,
+                "username" to mysql.username,
+                "password" to mysql.password,
+                "driver" to "MYSQL",
+                "driverDependency" to "com.mysql:mysql-connector-j:8.3.0"
             )
         )
         assertEquals(create.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
     }
 
     companion object {
-        private val postgres: PostgreSQLContainer<*> = PostgreSQLContainer("postgres:latest")
+        private val mysql: MySQLContainer<*> = MySQLContainer("mysql:latest")
 
 
         @BeforeAll
         @JvmStatic
         fun beforeAll() {
-            postgres.start()
+            mysql.start()
 
-            Class.forName(postgres.driverClassName)
-            DriverManager.getConnection(
-                postgres.jdbcUrl,
-                postgres.username,
-                postgres.password
-            ).createStatement().execute(object {}::class.java.getResource("/postgres.sql")!!.readText())
+            Class.forName(mysql.driverClassName)
+            val createStatement = DriverManager.getConnection(
+                "${mysql.jdbcUrl}?allowMultiQueries=true",
+                mysql.username,
+                mysql.password
+            ).createStatement()
+
+            createStatement.execute(object {}::class.java.getResource("/mysql.sql")!!.readText())
         }
 
         @AfterAll
         @JvmStatic
         fun afterAll() {
-            postgres.stop()
+            mysql.stop()
         }
     }
 }

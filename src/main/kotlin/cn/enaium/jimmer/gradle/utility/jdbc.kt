@@ -19,14 +19,13 @@ package cn.enaium.jimmer.gradle.utility
 import cn.enaium.jimmer.gradle.model.*
 import java.sql.DatabaseMetaData
 import java.sql.ResultSet
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * @author Enaium
  */
 enum class ColumnLabel {
-    COLUMN_NAME, TABLE_NAME, TYPE_NAME, REMARKS, COLUMN_DEF, IS_NULLABLE, PK_NAME, FKCOLUMN_NAME, PKTABLE_NAME, PKCOLUMN_NAME, FK_NAME, INDEX_NAME
+    COLUMN_NAME, TABLE_NAME, TYPE_NAME, REMARKS, COLUMN_DEF, NULLABLE, PK_NAME, FKCOLUMN_NAME, PKTABLE_NAME, PKCOLUMN_NAME, FK_NAME, INDEX_NAME
 }
 
 private fun ResultSet.toColumn(tableName: String): Column {
@@ -36,7 +35,7 @@ private fun ResultSet.toColumn(tableName: String): Column {
         getString(ColumnLabel.TYPE_NAME.name),
         getString(ColumnLabel.REMARKS.name),
         getString(ColumnLabel.COLUMN_DEF.name),
-        getBoolean(ColumnLabel.IS_NULLABLE.name)
+        getBoolean(ColumnLabel.NULLABLE.name)
     )
 }
 
