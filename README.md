@@ -36,6 +36,10 @@ jimmer {
             username.set("postgres")
             password.set("postgres")
         }
+        optional {
+            idView.set(true)
+            comment.set(true)
+        }
     }
 }
 ```

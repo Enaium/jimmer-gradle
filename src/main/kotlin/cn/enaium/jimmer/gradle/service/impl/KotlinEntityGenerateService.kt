@@ -72,7 +72,10 @@ class KotlinEntityGenerateService : EntityGenerateService {
                     return@Column
                 }
                 val pName = column.name.snakeToCamelCase(false)
-                val property = PropertySpec.builder(pName, getTypeName(generator.typeMappings.get(), column))
+                val property = PropertySpec.builder(
+                    pName,
+                    getTypeName(generator.typeMappings.get(), column).copy(nullable = column.nullable)
+                )
                 fs.add(PropertySpecBuilderWrapper(pName, column, property))
             }
             type2properties[TypeSpecBuilderWrapper(tName, table, tableInterface)] = fs
@@ -93,6 +96,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
                 val unique = table.uniqueKeys.filter { it.columns.size == 1 }.map { it.columns.first().name }
                     .contains(foreignKey.column.name)
+                val nullable = table.columns.first { it.name == foreignKey.column.name }.nullable
 
                 val tName = foreignKey.reference.tableName.snakeToCamelCase()
                 val pName = foreignKey.column.name.snakeToCamelCase(false).let {
@@ -116,8 +120,12 @@ class KotlinEntityGenerateService : EntityGenerateService {
                                         ClassName(
                                             generator.environment.packageName.get(),
                                             table.name.snakeToCamelCase()
-                                        )
-                                    ).addAnnotation(OneToOne::class)
+                                        ).copy(nullable = true)
+                                    ).addAnnotation(
+                                        AnnotationSpec.builder(OneToOne::class)
+                                            .addMember("mappedBy = %S", pName)
+                                            .build()
+                                    )
                                 )
                             )
                         }
@@ -125,7 +133,10 @@ class KotlinEntityGenerateService : EntityGenerateService {
                     property
                 } else {
                     val property =
-                        PropertySpec.builder(pName, ClassName(generator.environment.packageName.get(), tName))
+                        PropertySpec.builder(
+                            pName,
+                            ClassName(generator.environment.packageName.get(), tName).copy(nullable = nullable)
+                        )
                     property.addAnnotation(ManyToOne::class)
 
                     type2properties.forEach { (type, properties) ->

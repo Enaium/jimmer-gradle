@@ -8,6 +8,17 @@ create table people
     password      varchar(255)       not null
 );
 
+create table profile
+(
+    created_time  timestamp                          not null,
+    modified_time timestamp                          not null,
+    deleted       bool default false                 not null,
+    id            uuid primary key,
+    people_id     uuid unique references people (id) not null,
+    nickname      varchar(50) unique                 not null,
+    email         varchar(50) unique                 not null
+);
+
 create table topic
 (
     created_time  timestamp                   not null,
@@ -66,12 +77,12 @@ create table post_topic
 
 create table comment
 (
-    created_time  timestamp          not null,
-    modified_time timestamp          not null,
-    deleted       bool default false not null,
+    created_time  timestamp                   not null,
+    modified_time timestamp                   not null,
+    deleted       bool default false          not null,
     id            uuid primary key,
-    content       text               not null,
-    people_id uuid references people (id) not null,
+    content       text                        not null,
+    people_id     uuid references people (id) not null,
     comment_id    uuid references comment (id),
     answer_id     uuid references answer (id),
     post_id       uuid references post (id)
