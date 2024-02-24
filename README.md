@@ -1,12 +1,11 @@
 # jimmer-gradle
 
-![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square)
-![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square)
+![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square&logo=kotlin)
+![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square&logo=gradle)
 
-![Static Badge](https://img.shields.io/badge/-PostgreSQL-gray?style=flat-square&logo=postgresql)
-![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb)
-![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql)
-
+![Static Badge](https://img.shields.io/badge/-PostgreSQL-gray?style=flat-square&logo=postgresql&logoColor=white)
+![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb&logoColor=white)
+![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
 
 ## generate entity
 
