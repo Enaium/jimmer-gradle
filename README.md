@@ -1,5 +1,9 @@
 # jimmer-gradle
 
+![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square)
+![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square)
+
+
 ## generate entity
 
 Current only support PostgreSQL and generate kotlin entity.
@@ -9,7 +13,7 @@ import cn.enaium.jimmer.gradle.extension.Driver
 
 plugins {
     //...
-    id("cn.enaium.jimmer-gradle") version "0.0.1"
+    id("cn.enaium.jimmer.gradle") version "<version>"
 }
 
 group = "cn.enaium"
