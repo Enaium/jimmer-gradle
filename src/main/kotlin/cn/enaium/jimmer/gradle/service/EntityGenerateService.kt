@@ -23,6 +23,8 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import java.nio.file.Path
+import java.sql.Connection
+import java.sql.DriverManager
 
 /**
  * @author Enaium
@@ -30,20 +32,17 @@ import java.nio.file.Path
 interface EntityGenerateService {
     fun generate(generator: Generator): Map<Path, String>
 
+    fun getConnection(generator: Generator): Connection {
+        return DriverManager.getConnection(
+            generator.jdbc.url.get(),
+            generator.jdbc.username.get(),
+            generator.jdbc.password.get()
+        )
+    }
+
     fun getCommonColumns(tables: Set<Table>): Set<Column> {
         return tables.flatMap { it.columns }.groupBy { it.name }
             .filter { it -> it.value.size == tables.count { it.primaryKeys.isNotEmpty() } }.map { it.value.first() }
             .toSet()
-    }
-
-    fun getTypeName(typeMappings: Map<String, String>, column: Column): TypeName {
-        return typeMappings[column.type]
-            ?.let {
-                ClassName(
-                    it.substring(0, it.lastIndexOf(".")),
-                    it.substring(it.lastIndexOf(".") + 1)
-                )
-            }
-            ?: String::class.asTypeName().copy(nullable = column.nullable)
     }
 }

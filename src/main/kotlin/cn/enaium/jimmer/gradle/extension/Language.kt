@@ -20,5 +20,6 @@ package cn.enaium.jimmer.gradle.extension
  * @author Enaium
  */
 enum class Language {
-    KOTLIN
+    KOTLIN,
+    JAVA
 }

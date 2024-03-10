@@ -10,14 +10,13 @@ import java.nio.file.Files
 /**
  * @author Enaium
  */
-abstract class ProjectTest {
+class ProjectTest(private val name: String) {
 
-    private val testProjectDir: File = Files.createTempDirectory("${System.currentTimeMillis()}").toFile()
-
-    abstract fun name(): String
+    private val testProjectDir: File =
+        Files.createTempDirectory("jimmer-gradle-${name}-${System.currentTimeMillis()}").toFile()
 
     private fun copyInputFiles(stringMap: Map<String, String>) {
-        val baseProjectDir = File("src/test/resources/projects/${name()}")
+        val baseProjectDir = File("src/test/resources/projects/${name}")
         if (!baseProjectDir.exists()) {
             throw FileNotFoundException("Failed to find project directory at:" + baseProjectDir.absolutePath)
         }
@@ -34,7 +33,7 @@ abstract class ProjectTest {
             val text = it.readText(Charsets.UTF_8)
 
             tempFile.writeText(stringMap.entries.fold(text) { acc, entry ->
-                acc.replace("\${${entry.key}}", entry.value)
+                acc.replace("${'$'}{${entry.key}}", entry.value)
             })
         }
     }
@@ -45,20 +44,14 @@ abstract class ProjectTest {
     ): BuildResult {
         copyInputFiles(stringMap)
 
-        return GradleRunner.create()
-            .withProjectDir(testProjectDir)
-            .withArguments(
-                task,
-                "--stacktrace",
-                "--warning-mode",
-                "fail",
-                "--gradle-user-home",
-                File(System.getProperty("user.home"), ".gradle").absolutePath,
-            )
-            .withPluginClasspath()
-            .withGradleVersion(GradleVersion.current().version)
-            .forwardOutput()
-            .withDebug(true)
+        return GradleRunner.create().withProjectDir(testProjectDir).withArguments(
+            task,
+            "--stacktrace",
+            "--warning-mode",
+            "fail",
+            "--gradle-user-home",
+            File(System.getProperty("user.home"), ".gradle").absolutePath,
+        ).withPluginClasspath().withGradleVersion(GradleVersion.current().version).forwardOutput().withDebug(true)
             .build()
     }
 }

@@ -16,7 +16,11 @@
 
 package cn.enaium.jimmer.gradle.integration
 
+import cn.enaium.jimmer.gradle.extension.Driver
+import cn.enaium.jimmer.gradle.extension.Language
 import cn.enaium.jimmer.gradle.util.ProjectTest
+import cn.enaium.jimmer.gradle.util.dbMapBuilder
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -28,24 +32,31 @@ import kotlin.test.assertEquals
 /**
  * @author Enaium
  */
-class MySQLGeneratorTest : ProjectTest() {
-    override fun name(): String {
-        return "kotlinGenerator"
-    }
+class MySQLGeneratorTest {
+
+    private val driverDependency = "com.mysql:mysql-connector-j:8.3.0"
 
     @Test
     fun generateEntity() {
-        val create = create(
+        val kotlin = create(language = Language.KOTLIN)
+        assertEquals(kotlin.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
+
+        val java = create(language = Language.JAVA)
+        assertEquals(java.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
+    }
+
+    private fun create(language: Language): BuildResult {
+        return ProjectTest("simple").create(
             "generateEntity",
-            mapOf(
-                "url" to mysql.jdbcUrl,
-                "username" to mysql.username,
-                "password" to mysql.password,
-                "driver" to "MYSQL",
-                "driverDependency" to "com.mysql:mysql-connector-j:8.3.0"
+            dbMapBuilder(
+                mysql.jdbcUrl,
+                mysql.username,
+                mysql.password,
+                Driver.MYSQL.name,
+                language.name,
+                driverDependency
             )
         )
-        assertEquals(create.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
     }
 
     companion object {

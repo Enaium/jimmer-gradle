@@ -38,5 +38,23 @@ val kotlinTypeMappings = mapOf(
     "datetime" to LocalDateTime::class.qualifiedName!!,
     "timestamp" to LocalDateTime::class.qualifiedName!!,
     "bool" to Boolean::class.qualifiedName!!,
+    "boolean" to Boolean::class.qualifiedName!!,
     "uuid" to UUID::class.qualifiedName!!,
+)
+
+val javaTypeMappings = mapOf(
+    "smallint" to java.lang.Short::class.java.name,
+    "integer" to java.lang.Integer::class.java.name,
+    "bigint" to java.lang.Long::class.java.name,
+    "decimal" to BigDecimal::class.java.name,
+    "numeric" to BigDecimal::class.java.name,
+    "varchar" to java.lang.String::class.java.name,
+    "text" to java.lang.String::class.java.name,
+    "date" to LocalDate::class.java.name,
+    "time" to LocalTime::class.java.name,
+    "datetime" to LocalDateTime::class.java.name,
+    "timestamp" to LocalDateTime::class.java.name,
+    "bool" to java.lang.Boolean::class.java.name,
+    "boolean" to java.lang.Boolean::class.java.name,
+    "uuid" to UUID::class.java.name,
 )

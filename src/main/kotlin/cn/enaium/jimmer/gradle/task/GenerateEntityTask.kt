@@ -18,7 +18,9 @@ package cn.enaium.jimmer.gradle.task
 
 import cn.enaium.jimmer.gradle.extension.JimmerExtension
 import cn.enaium.jimmer.gradle.extension.Language
+import cn.enaium.jimmer.gradle.service.impl.JavaEntityGenerateService
 import cn.enaium.jimmer.gradle.service.impl.KotlinEntityGenerateService
+import cn.enaium.jimmer.gradle.utility.javaTypeMappings
 import cn.enaium.jimmer.gradle.utility.kotlinTypeMappings
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
@@ -41,6 +43,8 @@ open class GenerateEntityTask : DefaultTask() {
 
         if (generator.environment.language.get() == Language.KOTLIN) {
             generator.typeMappings.convention(kotlinTypeMappings)
+        } else if (generator.environment.language.get() == Language.JAVA) {
+            generator.typeMappings.convention(javaTypeMappings)
         }
 
         val classloader = project.configurations.named("runtimeClasspath").get()
@@ -56,7 +60,13 @@ open class GenerateEntityTask : DefaultTask() {
             )
         )
 
-        val generateEntityService = KotlinEntityGenerateService()
+        val generateEntityService = if (generator.environment.language.get() == Language.KOTLIN) {
+            KotlinEntityGenerateService()
+        } else if (generator.environment.language.get() == Language.JAVA) {
+            JavaEntityGenerateService()
+        } else {
+            throw RuntimeException("Unknown language ${generator.environment.language}")
+        }
         generateEntityService.generate(extension.generator).forEach { (relative, content) ->
             val toFile = project.projectDir.toPath().resolve(relative).toFile()
             toFile.parentFile.mkdirs()

@@ -16,7 +16,11 @@
 
 package cn.enaium.jimmer.gradle.integration
 
+import cn.enaium.jimmer.gradle.extension.Driver
+import cn.enaium.jimmer.gradle.extension.Language
 import cn.enaium.jimmer.gradle.util.ProjectTest
+import cn.enaium.jimmer.gradle.util.dbMapBuilder
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -28,24 +32,32 @@ import kotlin.test.assertEquals
 /**
  * @author Enaium
  */
-class PostgresSQLGeneratorTest : ProjectTest() {
-    override fun name(): String {
-        return "kotlinGenerator"
-    }
+class PostgresSQLGeneratorTest {
+
+    private val projectTest = ProjectTest("simple")
+    private val driverDependency = "org.postgresql:postgresql:42.6.0"
 
     @Test
     fun generateEntity() {
-        val create = create(
+        val kotlin = create(language = Language.KOTLIN)
+        assertEquals(kotlin.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
+
+        val java = create(language = Language.JAVA)
+        assertEquals(java.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
+    }
+
+    private fun create(language: Language): BuildResult {
+        return projectTest.create(
             "generateEntity",
-            mapOf(
-                "url" to postgres.jdbcUrl,
-                "username" to postgres.username,
-                "password" to postgres.password,
-                "driver" to "POSTGRESQL",
-                "driverDependency" to "org.postgresql:postgresql:42.6.0"
+            dbMapBuilder(
+                postgres.jdbcUrl,
+                postgres.username,
+                postgres.password,
+                Driver.POSTGRESQL.name,
+                language.name,
+                driverDependency
             )
         )
-        assertEquals(create.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
     }
 
     companion object {

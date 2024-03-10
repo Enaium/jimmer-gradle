@@ -27,7 +27,7 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.babyfish.jimmer.sql.*
 import java.nio.file.Path
-import java.sql.DriverManager
+import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.io.path.Path
 
@@ -41,19 +41,13 @@ class KotlinEntityGenerateService : EntityGenerateService {
      * @return relative path and content
      */
     override fun generate(generator: Generator): Map<Path, String> {
-        val connection = DriverManager.getConnection(
-            generator.jdbc.url.get(),
-            generator.jdbc.username.get(),
-            generator.jdbc.password.get()
-        )
-
-        val metaData = connection.metaData
+        val metaData = getConnection(generator).metaData
 
         val tables = metaData.getTables()
 
         val commonColumns = getCommonColumns(tables)
 
-        val type2properties: MutableMap<TypeSpecBuilderWrapper, CopyOnWriteArrayList<PropertySpecBuilderWrapper>> =
+        val type2properties: MutableMap<Type, CopyOnWriteArrayList<Property>> =
             mutableMapOf()
 
         // Initialize
@@ -65,7 +59,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
             val tName = table.name.snakeToCamelCase()
             val tableInterface = TypeSpec.interfaceBuilder(tName)
-            val fs = CopyOnWriteArrayList<PropertySpecBuilderWrapper>()
+            val fs = CopyOnWriteArrayList<Property>()
             table.columns.forEach Column@{ column ->
                 // Skip column if it is common column
                 if (commonColumns.map { it.name }.contains(column.name)) {
@@ -76,9 +70,9 @@ class KotlinEntityGenerateService : EntityGenerateService {
                     pName,
                     getTypeName(generator.typeMappings.get(), column).copy(nullable = column.nullable)
                 )
-                fs.add(PropertySpecBuilderWrapper(pName, column, property))
+                fs.add(Property(pName, column, property))
             }
-            type2properties[TypeSpecBuilderWrapper(tName, table, tableInterface)] = fs
+            type2properties[Type(tName, table, tableInterface)] = fs
         }
 
         // Add `OneToOne` and `OneToMany` properties
@@ -112,7 +106,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
                         if (type.table?.name == foreignKey.reference.tableName) {
                             val snakeToCamelCase = table.name.snakeToCamelCase(false)
                             properties.add(
-                                PropertySpecBuilderWrapper(
+                                Property(
                                     snakeToCamelCase,
                                     null,
                                     PropertySpec.builder(
@@ -143,7 +137,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
                         if (type.table?.name == foreignKey.reference.tableName) {
                             val snakeToCamelCase = table.name.snakeToCamelCase(false).toPlural()
                             properties.add(
-                                PropertySpecBuilderWrapper(
+                                Property(
                                     snakeToCamelCase,
                                     null,
                                     PropertySpec.builder(
@@ -170,7 +164,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
                 // Add property to relevant table
                 type2properties.forEach { (type, properties) ->
                     if (type.table?.name == table.name) {
-                        properties.add(PropertySpecBuilderWrapper(pName, null, property))
+                        properties.add(Property(pName, null, property))
                     }
                 }
             }
@@ -224,32 +218,34 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
             type2properties.forEach { (type, properties) ->
                 if (type.table?.name == t1) {
-                    properties.add(PropertySpecBuilderWrapper(p1, null, property2))
+                    properties.add(Property(p1, null, property2))
                 }
                 if (type.table?.name == t2) {
-                    properties.add(PropertySpecBuilderWrapper(p2, null, property1))
+                    properties.add(Property(p2, null, property1))
                 }
             }
         }
 
         if (commonColumns.isNotEmpty()) {
             // Add BaseEntity
-            val baseEntity = TypeSpecBuilderWrapper(
+            val baseEntity = Type(
                 "BaseEntity", null,
                 TypeSpec.interfaceBuilder("BaseEntity").addAnnotation(MappedSuperclass::class)
             )
 
-            val baseEntityProperties = CopyOnWriteArrayList<PropertySpecBuilderWrapper>()
+            val baseEntityProperties = CopyOnWriteArrayList<Property>()
             commonColumns.forEach { column ->
                 val pName = column.name.snakeToCamelCase(false)
                 val property = PropertySpec.builder(pName, getTypeName(generator.typeMappings.get(), column))
 
                 // Add column comment if comment is enabled
                 if (generator.optional.comment.get()) {
-                    property.addKdoc(column.remark ?: "")
+                    column.remark?.let {
+                        property.addKdoc(it)
+                    }
                 }
 
-                baseEntityProperties.add(PropertySpecBuilderWrapper(pName, column, property))
+                baseEntityProperties.add(Property(pName, column, property))
             }
             type2properties[baseEntity] = baseEntityProperties
         }
@@ -285,7 +281,9 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
                 // Add column comment if comment is enabled
                 if (generator.optional.comment.get()) {
-                    property.builder.addKdoc(property.column.remark ?: "")
+                    property.column.remark?.let {
+                        property.builder.addKdoc(it)
+                    }
                 }
             }
         }
@@ -304,7 +302,18 @@ class KotlinEntityGenerateService : EntityGenerateService {
             ) to file.build().toString()
         }.toMap()
     }
-}
 
-class TypeSpecBuilderWrapper(val name: String, val table: Table?, val builder: TypeSpec.Builder)
-class PropertySpecBuilderWrapper(val name: String, val column: Column?, val builder: PropertySpec.Builder)
+    private fun getTypeName(typeMappings: Map<String, String>, column: Column): TypeName {
+        return typeMappings[column.type.lowercase(Locale.ROOT)]
+            ?.let {
+                ClassName(
+                    it.substring(0, it.lastIndexOf(".")),
+                    it.substring(it.lastIndexOf(".") + 1)
+                )
+            }
+            ?: String::class.asTypeName().copy(nullable = column.nullable)
+    }
+
+    class Type(val name: String, val table: Table?, val builder: TypeSpec.Builder)
+    class Property(val name: String, val column: Column?, val builder: PropertySpec.Builder)
+}

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "cn.enaium"
-version = "0.0.3"
+version = "0.0.4"
 
 repositories {
     mavenCentral()
@@ -15,6 +15,7 @@ repositories {
 dependencies {
     implementation("com.squareup:kotlinpoet:${property("kotlinpoet")}")
     implementation("com.squareup:javapoet:${property("javapoet")}")
+    implementation("org.jetbrains:annotations:${property("jetbrainsAnnotations")}")
     implementation("org.babyfish.jimmer:jimmer-core:${property("jimmer")}")
     testImplementation("org.testcontainers:postgresql:${property("testcontainers")}")
     testImplementation("org.testcontainers:mariadb:${property("testcontainers")}")
