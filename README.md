@@ -3,6 +3,11 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square&logo=kotlin)
 ![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square&logo=gradle)
 
+Feature:
+
+- Generate code for database table and column.
+- Incremental compile for dto language (apt/ksp)
+
 ## generate entity
 
 ![Static Badge](https://img.shields.io/badge/-Kotlin-gray?style=flat-square&logo=kotlin&logoColor=white)
@@ -29,18 +34,18 @@ repositories {
 
 dependencies {
     //...
-    implementation("org.postgresql:postgresql:42.6.0")
+    implementation("org.postgresql:postgresql:42.6.0")//require jdbc driver
 }
 
 jimmer {
     generator {
         environment {
-            language.set(Language.KOTLIN)
+            language.set(Language.KOTLIN)//Language.JAVA
             srcDir.set("src/main/kotlin")
             packageName.set("cn.enaium")
         }
         jdbc {
-            driver.set(Driver.POSTGRESQL)
+            driver.set(Driver.POSTGRESQL)//Driver.MARIADB,Driver.MYSQL
             url.set("jdbc:postgresql://localhost:5432/postgres")
             username.set("postgres")
             password.set("postgres")
@@ -52,3 +57,16 @@ jimmer {
     }
 }
 ```
+
+## dto incremental compile
+
+```kotlin
+jimmer {
+    generator {
+        environment {
+            language.set(Language.KOTLIN)//Language.JAVA
+        }
+    }
+}
+```
+
