@@ -6,13 +6,15 @@ plugins {
 }
 
 group = "cn.enaium"
-version = "0.0.4"
+version = "0.0.5"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.9.23-1.0.19")
+
     implementation("com.squareup:kotlinpoet:${property("kotlinpoet")}")
     implementation("com.squareup:javapoet:${property("javapoet")}")
     implementation("org.jetbrains:annotations:${property("jetbrainsAnnotations")}")

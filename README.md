@@ -35,6 +35,7 @@ dependencies {
 jimmer {
     generator {
         environment {
+            language.set(Language.KOTLIN)
             srcDir.set("src/main/kotlin")
             packageName.set("cn.enaium")
         }

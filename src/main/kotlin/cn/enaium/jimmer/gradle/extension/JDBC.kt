@@ -24,7 +24,7 @@ import javax.inject.Inject
  * @author Enaium
  */
 open class JDBC @Inject constructor(objects: ObjectFactory) {
-    val driver: Property<Driver> = objects.property(Driver::class.java).convention(Driver.POSTGRESQL)
+    val driver: Property<Driver> = objects.property(Driver::class.java)
     val url: Property<String> = objects.property(String::class.java)
     val username: Property<String> = objects.property(String::class.java)
     val password: Property<String> = objects.property(String::class.java)

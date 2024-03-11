@@ -26,5 +26,5 @@ import javax.inject.Inject
 open class Environment @Inject constructor(objects: ObjectFactory) {
     val srcDir: Property<String> = objects.property(String::class.java)
     val packageName: Property<String> = objects.property(String::class.java)
-    val language: Property<Language> = objects.property(Language::class.java).convention(Language.KOTLIN)
+    val language: Property<Language> = objects.property(Language::class.java)
 }

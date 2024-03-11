@@ -17,9 +17,12 @@
 package cn.enaium.jimmer.gradle
 
 import cn.enaium.jimmer.gradle.extension.JimmerExtension
+import cn.enaium.jimmer.gradle.extension.Language
 import cn.enaium.jimmer.gradle.task.GenerateEntityTask
+import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.compile.JavaCompile
 
 /**
  * @author Enaium
@@ -31,6 +34,58 @@ class JimmerPlugin : Plugin<Project> {
         project.afterEvaluate { afterProject ->
             afterProject.tasks.create("generateEntity", GenerateEntityTask::class.java) {
                 it.group = "jimmer"
+            }
+
+            if (afterProject.tasks.names.contains("compileJava") && extension.generator.environment.language.get() == Language.JAVA) {
+                afterProject.tasks.withType(JavaCompile::class.java) { compile ->
+                    compile.options.compilerArgs.firstOrNull {
+                        it.startsWith("-Ajimmer.dto.dirs=")
+                    }?.let {
+                        val dirs = it.split("=")[1]
+                        for (path in dirs.trim().split("\\*[,:;]\\s*".toRegex())) {
+                            var p = path
+                            if (p.isEmpty() || p == "/") {
+                                continue
+                            }
+                            if (p.startsWith("/")) {
+                                p = p.substring(1)
+                            }
+                            if (path.endsWith("/")) {
+                                p = p.substring(0, path.length - 1)
+                            }
+                            if (p.isNotEmpty()) {
+                                compile.inputs.dir(p)
+                            }
+                        }
+                    } ?: let {
+                        val dir = afterProject.layout.projectDirectory.dir("src").file("main/dto/")
+                        if (dir.asFile.exists()) {
+                            compile.inputs.dir(dir)
+                        }
+                    }
+                }
+            }
+
+            if (afterProject.tasks.names.contains("kspKotlin") && extension.generator.environment.language.get() == Language.KOTLIN) {
+                afterProject.tasks.getByName("kspKotlin") { kspKotlin ->
+                    afterProject.extensions.getByType(KspExtension::class.java).arguments["jimmer.dto.dirs"]?.let { dirs ->
+                        dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
+                            when {
+                                it == "" || it == "/" -> null
+                                it.startsWith("/") -> it.substring(1)
+                                it.endsWith("/") -> it.substring(0, it.length - 1)
+                                else -> it.takeIf { it.isNotEmpty() }
+                            }
+                        }.toSet().forEach {
+                            kspKotlin.inputs.dir(it)
+                        }
+                    } ?: let {
+                        val dir = afterProject.layout.projectDirectory.dir("src").file("main/dto/")
+                        if (dir.asFile.exists()) {
+                            kspKotlin.inputs.dir(dir)
+                        }
+                    }
+                }
             }
         }
     }
