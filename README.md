@@ -6,7 +6,17 @@
 Feature:
 
 - Generate code for database table and column.
-- Incremental compile for dto language (apt/ksp)
+- Incremental compile for dto language (apt/ksp).
+- implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
+- annotationProcessor/ksp for dependencies.
+
+## version
+
+```kotlin
+jimmer {
+    version.set("0.8.107")//default latest
+}
+```
 
 ## generate entity
 
@@ -18,18 +28,9 @@ Feature:
 ![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
 
 ```kotlin
-import cn.enaium.jimmer.gradle.extension.Driver
-
 plugins {
     //...
     id("cn.enaium.jimmer.gradle") version "<version>"
-}
-
-group = "cn.enaium"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -38,9 +39,9 @@ dependencies {
 }
 
 jimmer {
+    language.set(Language.KOTLIN)//Language.JAVA
     generator {
-        environment {
-            language.set(Language.KOTLIN)//Language.JAVA
+        target {
             srcDir.set("src/main/kotlin")
             packageName.set("cn.enaium")
         }
@@ -62,11 +63,58 @@ jimmer {
 
 ```kotlin
 jimmer {
-    generator {
-        environment {
-            language.set(Language.KOTLIN)//Language.JAVA
-        }
-    }
+    language.set(Language.KOTLIN)//Language.JAVA
 }
 ```
 
+## implementation for dependencies
+
+### spring-boot-start
+
+```kotlin
+plugins {
+    id("org.springframework.boot")//require
+}
+
+jimmer {
+    language = Language.KOTLIN//Language.JAVA
+}
+```
+
+### sql-kotlin
+
+```kotlin
+jimmer {
+    language = Language.KOTLIN
+}
+```
+
+### sql
+
+```kotlin
+jimmer {
+    language = Language.JAVA
+}
+```
+
+## annotationProcessor/ksp for dependencies
+
+## ksp
+
+```kotlin
+plugins {
+    id("com.google.devtools.ksp")//require
+}
+
+jimmer {
+    language = Language.KOTLIN
+}
+```
+
+## annotationProcessor
+
+```kotlin
+jimmer {
+    language = Language.JAVA
+}
+```

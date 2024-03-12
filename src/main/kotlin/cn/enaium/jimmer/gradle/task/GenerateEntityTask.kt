@@ -41,9 +41,9 @@ open class GenerateEntityTask : DefaultTask() {
         val extension = project.extensions.getByType(JimmerExtension::class.java)
         val generator = extension.generator
 
-        if (generator.environment.language.get() == Language.KOTLIN) {
+        if (extension.language.get() == Language.KOTLIN) {
             generator.typeMappings.convention(kotlinTypeMappings)
-        } else if (generator.environment.language.get() == Language.JAVA) {
+        } else if (extension.language.get() == Language.JAVA) {
             generator.typeMappings.convention(javaTypeMappings)
         }
 
@@ -60,12 +60,12 @@ open class GenerateEntityTask : DefaultTask() {
             )
         )
 
-        val generateEntityService = if (generator.environment.language.get() == Language.KOTLIN) {
+        val generateEntityService = if (extension.language.get() == Language.KOTLIN) {
             KotlinEntityGenerateService()
-        } else if (generator.environment.language.get() == Language.JAVA) {
+        } else if (extension.language.get() == Language.JAVA) {
             JavaEntityGenerateService()
         } else {
-            throw RuntimeException("Unknown language ${generator.environment.language}")
+            throw RuntimeException("Unknown language ${extension.language}")
         }
         generateEntityService.generate(extension.generator).forEach { (relative, content) ->
             val toFile = project.projectDir.toPath().resolve(relative).toFile()

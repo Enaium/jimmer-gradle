@@ -10,11 +10,11 @@ group = "cn.enaium"
 version = "0.0.1"
 
 jimmer {
+    language.set(Language.${language})
     generator {
-        environment {
+        target {
             srcDir.set("src/main/${language}".lowercase())
             packageName.set("cn.enaium")
-            language.set(Language.${language})
         }
         jdbc {
             driver.set(Driver.${driver})

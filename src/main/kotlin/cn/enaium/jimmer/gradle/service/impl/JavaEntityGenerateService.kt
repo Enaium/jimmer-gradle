@@ -111,7 +111,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                 val property = if (unique) {
                     val property = MethodSpec.methodBuilder(pName)
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(generator.environment.packageName.get(), tName))
+                        .returns(ClassName.get(generator.target.packageName.get(), tName))
                         .addAnnotation(OneToOne::class.java)
 
                     type2properties.forEach { (type, properties) ->
@@ -125,7 +125,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                         .returns(
                                             ClassName.get(
-                                                generator.environment.packageName.get(),
+                                                generator.target.packageName.get(),
                                                 table.name.snakeToCamelCase()
                                             )
                                         ).addAnnotations(
@@ -145,7 +145,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                 } else {
                     val property = MethodSpec.methodBuilder(pName)
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(generator.environment.packageName.get(), tName))
+                        .returns(ClassName.get(generator.target.packageName.get(), tName))
                     property.addAnnotation(AnnotationSpec.builder(ManyToOne::class.java).build())
 
                     if (nullable) {
@@ -165,7 +165,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                                             ParameterizedTypeName.get(
                                                 ClassName.get(java.util.List::class.java),
                                                 ClassName.get(
-                                                    generator.environment.packageName.get(),
+                                                    generator.target.packageName.get(),
                                                     table.name.snakeToCamelCase()
                                                 )
                                             )
@@ -211,7 +211,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                 .returns(
                     ParameterizedTypeName.get(
                         ClassName.get(java.util.List::class.java),
-                        ClassName.get(generator.environment.packageName.get(), t1.snakeToCamelCase())
+                        ClassName.get(generator.target.packageName.get(), t1.snakeToCamelCase())
                     )
                 )
                 .addAnnotations(
@@ -230,7 +230,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                 .returns(
                     ParameterizedTypeName.get(
                         ClassName.get(java.util.List::class.java),
-                        ClassName.get(generator.environment.packageName.get(), t2.snakeToCamelCase())
+                        ClassName.get(generator.target.packageName.get(), t2.snakeToCamelCase())
                     )
                 ).addAnnotation(
                     AnnotationSpec.builder(ManyToMany::class.java)
@@ -297,7 +297,7 @@ class JavaEntityGenerateService : EntityGenerateService {
             if (commonColumns.isNotEmpty()) {
                 type.builder.addSuperinterface(
                     ClassName.get(
-                        generator.environment.packageName.get(),
+                        generator.target.packageName.get(),
                         "BaseEntity"
                     )
                 )
@@ -330,12 +330,12 @@ class JavaEntityGenerateService : EntityGenerateService {
                 it.key.builder.addMethod(p.builder.build())
             }
 
-            val file = JavaFile.builder(generator.environment.packageName.get(), it.key.builder.build())
+            val file = JavaFile.builder(generator.target.packageName.get(), it.key.builder.build())
                 .indent(generator.poet.indent.get())
 
             Path(
-                generator.environment.srcDir.get(),
-                generator.environment.packageName.get().replace(".", "/"),
+                generator.target.srcDir.get(),
+                generator.target.packageName.get().replace(".", "/"),
                 "${it.key.name}.java"
             ) to file.build().toString()
         }.toMap()

@@ -36,7 +36,7 @@ class JimmerPlugin : Plugin<Project> {
                 it.group = "jimmer"
             }
 
-            if (afterProject.tasks.names.contains("compileJava") && extension.generator.environment.language.get() == Language.JAVA) {
+            if (afterProject.tasks.names.contains("compileJava") && extension.language.get() == Language.JAVA) {
                 afterProject.tasks.withType(JavaCompile::class.java) { compile ->
                     compile.options.compilerArgs.firstOrNull {
                         it.startsWith("-Ajimmer.dto.dirs=")
@@ -66,7 +66,7 @@ class JimmerPlugin : Plugin<Project> {
                 }
             }
 
-            if (afterProject.tasks.names.contains("kspKotlin") && extension.generator.environment.language.get() == Language.KOTLIN) {
+            if (afterProject.tasks.names.contains("kspKotlin") && extension.language.get() == Language.KOTLIN) {
                 afterProject.tasks.getByName("kspKotlin") { kspKotlin ->
                     afterProject.extensions.getByType(KspExtension::class.java).arguments["jimmer.dto.dirs"]?.let { dirs ->
                         dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
@@ -87,6 +87,40 @@ class JimmerPlugin : Plugin<Project> {
                     }
                 }
             }
+
+            // Add spring-boot-starter,sql,sql-kotlin
+            if (afterProject.plugins.hasPlugin("org.springframework.boot")) {
+                afterProject.dependencies.add(
+                    "implementation",
+                    "org.babyfish.jimmer:jimmer-spring-boot-starter:${extension.version.get()}"
+                )
+            } else if (extension.language.get() == Language.JAVA) {
+                afterProject.dependencies.add(
+                    "implementation",
+                    "org.babyfish.jimmer:jimmer-sql:${extension.version.get()}"
+                )
+            } else if (extension.language.get() == Language.KOTLIN) {
+                afterProject.dependencies.add(
+                    "implementation",
+                    "org.babyfish.jimmer:jimmer-sql-kotlin:${extension.version.get()}"
+                )
+            }
+
+            // Add apt
+            if (project.plugins.hasPlugin("java")) {
+                project.dependencies.add(
+                    "annotationProcessor",
+                    "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
+                )
+            }
+        }
+
+        // Add ksp
+        if (project.plugins.hasPlugin("com.google.devtools.ksp")) {
+            project.dependencies.add(
+                "ksp",
+                "org.babyfish.jimmer:jimmer-ksp:${extension.version.get()}"
+            )
         }
     }
 }

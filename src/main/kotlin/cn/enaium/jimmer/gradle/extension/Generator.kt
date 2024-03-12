@@ -25,15 +25,15 @@ import javax.inject.Inject
  * @author Enaium
  */
 open class Generator @Inject constructor(objects: ObjectFactory) {
-    internal val environment: Environment = objects.newInstance(Environment::class.java)
+    internal val target: Target = objects.newInstance(Target::class.java)
     internal val jdbc: JDBC = objects.newInstance(JDBC::class.java)
     internal val optional: Optional = objects.newInstance(Optional::class.java)
     val typeMappings: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
     internal val poet: Poet = objects.newInstance(Poet::class.java)
 
 
-    fun environment(action: Action<Environment>) {
-        action.execute(environment)
+    fun target(action: Action<Target>) {
+        action.execute(target)
     }
 
     fun jdbc(action: Action<JDBC>) {

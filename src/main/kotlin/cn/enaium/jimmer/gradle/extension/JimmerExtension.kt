@@ -26,6 +26,8 @@ import javax.inject.Inject
  */
 open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
     internal val generator: Generator = objects.newInstance(Generator::class.java)
+    val language: Property<Language> = objects.property(Language::class.java)
+    val version: Property<String> = objects.property(String::class.java).convention("+")
 
     fun generator(action: Action<Generator>) {
         action.execute(generator)

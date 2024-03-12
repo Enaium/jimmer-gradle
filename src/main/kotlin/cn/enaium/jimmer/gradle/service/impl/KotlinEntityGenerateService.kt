@@ -99,7 +99,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
                 val property = if (unique) {
                     val property =
-                        PropertySpec.builder(pName, ClassName(generator.environment.packageName.get(), tName))
+                        PropertySpec.builder(pName, ClassName(generator.target.packageName.get(), tName))
                     property.addAnnotation(OneToOne::class)
 
                     type2properties.forEach { (type, properties) ->
@@ -112,7 +112,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
                                     PropertySpec.builder(
                                         snakeToCamelCase,
                                         ClassName(
-                                            generator.environment.packageName.get(),
+                                            generator.target.packageName.get(),
                                             table.name.snakeToCamelCase()
                                         ).copy(nullable = true)
                                     ).addAnnotation(
@@ -129,7 +129,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
                     val property =
                         PropertySpec.builder(
                             pName,
-                            ClassName(generator.environment.packageName.get(), tName).copy(nullable = nullable)
+                            ClassName(generator.target.packageName.get(), tName).copy(nullable = nullable)
                         )
                     property.addAnnotation(ManyToOne::class)
 
@@ -145,7 +145,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
                                         List::class.asClassName()
                                             .parameterizedBy(
                                                 ClassName(
-                                                    generator.environment.packageName.get(),
+                                                    generator.target.packageName.get(),
                                                     table.name.snakeToCamelCase()
                                                 )
                                             )
@@ -189,7 +189,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
             val property1 = PropertySpec.builder(
                 p1, List::class.asClassName().parameterizedBy(
-                    ClassName(generator.environment.packageName.get(), t1.snakeToCamelCase())
+                    ClassName(generator.target.packageName.get(), t1.snakeToCamelCase())
                 )
             )
                 .addAnnotations(
@@ -206,7 +206,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
             val property2 = PropertySpec.builder(
                 p2, List::class.asClassName().parameterizedBy(
-                    ClassName(generator.environment.packageName.get(), t2.snakeToCamelCase())
+                    ClassName(generator.target.packageName.get(), t2.snakeToCamelCase())
                 )
             )
                 .addAnnotation(
@@ -263,7 +263,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
 
             // Add BaseEntity superinterface
             if (commonColumns.isNotEmpty()) {
-                type.builder.addSuperinterface(ClassName(generator.environment.packageName.get(), "BaseEntity"))
+                type.builder.addSuperinterface(ClassName(generator.target.packageName.get(), "BaseEntity"))
             }
 
             properties.forEach property@{ property ->
@@ -289,15 +289,15 @@ class KotlinEntityGenerateService : EntityGenerateService {
         }
 
         return type2properties.map {
-            val file = FileSpec.builder(generator.environment.packageName.get(), it.key.name)
+            val file = FileSpec.builder(generator.target.packageName.get(), it.key.name)
                 .indent(generator.poet.indent.get())
             it.value.forEach { p ->
                 it.key.builder.addProperty(p.builder.build())
             }
             file.addType(it.key.builder.build())
             Path(
-                generator.environment.srcDir.get(),
-                generator.environment.packageName.get().replace(".", "/"),
+                generator.target.srcDir.get(),
+                generator.target.packageName.get().replace(".", "/"),
                 "${it.key.name}.kt"
             ) to file.build().toString()
         }.toMap()
