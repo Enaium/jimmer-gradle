@@ -28,6 +28,9 @@ jimmer {
 ![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+import cn.enaium.jimmer.gradle.extension.Driver
+
 plugins {
     //...
     id("cn.enaium.jimmer.gradle") version "<version>"
@@ -62,6 +65,8 @@ jimmer {
 ## dto incremental compile
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+
 jimmer {
     language.set(Language.KOTLIN)//Language.JAVA
 }
@@ -72,6 +77,8 @@ jimmer {
 ### spring-boot-start
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+
 plugins {
     id("org.springframework.boot")//require
 }
@@ -84,6 +91,8 @@ jimmer {
 ### sql-kotlin
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+
 jimmer {
     language = Language.KOTLIN
 }
@@ -92,6 +101,8 @@ jimmer {
 ### sql
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+
 jimmer {
     language = Language.JAVA
 }
@@ -102,6 +113,8 @@ jimmer {
 ## ksp
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+
 plugins {
     id("com.google.devtools.ksp")//require
 }
@@ -114,6 +127,8 @@ jimmer {
 ## annotationProcessor
 
 ```kotlin
+import cn.enaium.jimmer.gradle.extension.Language
+
 jimmer {
     language = Language.JAVA
 }
