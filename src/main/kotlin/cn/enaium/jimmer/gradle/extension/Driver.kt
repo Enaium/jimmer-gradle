@@ -23,4 +23,19 @@ enum class Driver(val className: String, val module: String) {
     POSTGRESQL("org.postgresql.Driver", "postgresql"),
     MARIADB("org.mariadb.jdbc.Driver", "mariadb"),
     MYSQL("com.mysql.cj.jdbc.Driver", "mysql"),
+
+    //Unverified
+    H2("org.h2.Driver", "h2"),
+
+    //Unverified
+    HYPERSONIC("org.hsqldb.jdbc.JDBCDriver", "hsqldb"),
+
+    //Unverified
+    ORACLE("oracle.jdbc.driver.OracleDriver", "ojdbc"),
+
+    //Unverified
+    DB2("com.ibm.db2.jcc.DB2Driver", "jcc"),
+
+    //Unverified
+    SQL_SERVER("com.microsoft.sqlserver.jdbc.SQLServerDriver", "mssql-jdbc")
 }
