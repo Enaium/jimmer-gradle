@@ -19,10 +19,7 @@ package cn.enaium.jimmer.gradle.service
 import cn.enaium.jimmer.gradle.extension.Generator
 import cn.enaium.jimmer.gradle.model.Column
 import cn.enaium.jimmer.gradle.model.Table
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.asTypeName
-import java.nio.file.Path
+import org.gradle.api.Project
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -30,7 +27,8 @@ import java.sql.DriverManager
  * @author Enaium
  */
 interface EntityGenerateService {
-    fun generate(generator: Generator): Map<Path, String>
+
+    fun generate(project: Project, generator: Generator)
 
     fun getConnection(generator: Generator): Connection {
         return DriverManager.getConnection(
@@ -41,8 +39,10 @@ interface EntityGenerateService {
     }
 
     fun getCommonColumns(tables: Set<Table>): Set<Column> {
-        return tables.flatMap { it.columns }.groupBy { it.name }
+        return tables.asSequence().flatMap { it.columns }.groupBy { it.name }
             .filter { it -> it.value.size == tables.count { it.primaryKeys.isNotEmpty() } }.map { it.value.first() }
             .toSet()
     }
 }
+
+internal const val BASE_ENTITY = "BaseEntity"

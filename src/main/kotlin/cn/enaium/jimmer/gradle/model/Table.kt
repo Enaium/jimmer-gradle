@@ -23,7 +23,7 @@ data class Table(
     val name: String,
     val columns: Set<Column>,
     val primaryKeys: Set<PrimaryKey>,
-    val foreignKeys: Set<ForeignKey>,
+    val foreignKeys: MutableSet<ForeignKey>,
     val uniqueKeys: Set<UniqueKey>
 ) {
     override fun equals(other: Any?): Boolean {

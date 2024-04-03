@@ -16,7 +16,6 @@
 
 package cn.enaium.jimmer.gradle.extension
 
-import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import javax.inject.Inject
@@ -29,8 +28,8 @@ open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
     val language: Property<Language> = objects.property(Language::class.java)
     val version: Property<String> = objects.property(String::class.java).convention("+")
 
-    fun generator(action: Action<Generator>) {
-        action.execute(generator)
+    fun generator(action: Generator.() -> Unit) {
+        action.invoke(generator)
     }
 }
 

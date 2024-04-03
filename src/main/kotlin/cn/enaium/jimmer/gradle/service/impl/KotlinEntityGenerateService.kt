@@ -16,20 +16,18 @@
 
 package cn.enaium.jimmer.gradle.service.impl
 
+import cn.enaium.jimmer.gradle.extension.Association
 import cn.enaium.jimmer.gradle.extension.Generator
 import cn.enaium.jimmer.gradle.model.Column
-import cn.enaium.jimmer.gradle.model.Table
+import cn.enaium.jimmer.gradle.model.ForeignKey
+import cn.enaium.jimmer.gradle.service.BASE_ENTITY
 import cn.enaium.jimmer.gradle.service.EntityGenerateService
-import cn.enaium.jimmer.gradle.utility.getTables
-import cn.enaium.jimmer.gradle.utility.snakeToCamelCase
-import cn.enaium.jimmer.gradle.utility.toPlural
+import cn.enaium.jimmer.gradle.utility.*
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.babyfish.jimmer.sql.*
-import java.nio.file.Path
+import org.gradle.api.Project
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.io.path.Path
 
 /**
  * @author Enaium
@@ -40,267 +38,213 @@ class KotlinEntityGenerateService : EntityGenerateService {
      * @param generator Generator
      * @return relative path and content
      */
-    override fun generate(generator: Generator): Map<Path, String> {
+    override fun generate(project: Project, generator: Generator) {
+        val idSuffix = "_${generator.table.primaryKey.get()}"
+
         val metaData = getConnection(generator).metaData
 
         val tables = metaData.getTables()
 
         val commonColumns = getCommonColumns(tables)
 
-        val type2properties: MutableMap<Type, CopyOnWriteArrayList<Property>> =
-            mutableMapOf()
+        val type2Builder = mutableMapOf<String, TypeSpec.Builder>()
 
-        // Initialize
-        tables.forEach Table@{ table ->
-            // Skip table if it has no primary key
-            if (table.primaryKeys.isEmpty()) {
-                return@Table
-            }
+        val packageName = generator.target.packageName.get()
 
-            val tName = table.name.snakeToCamelCase()
-            val tableInterface = TypeSpec.interfaceBuilder(tName)
-            val fs = CopyOnWriteArrayList<Property>()
-            table.columns.forEach Column@{ column ->
-                // Skip column if it is common column
-                if (commonColumns.map { it.name }.contains(column.name)) {
-                    return@Column
-                }
-                val pName = column.name.snakeToCamelCase(false)
-                val property = PropertySpec.builder(
-                    pName,
-                    getTypeName(generator.typeMappings.get(), column).copy(nullable = column.nullable)
-                )
-                fs.add(Property(pName, column, property))
-            }
-            type2properties[Type(tName, table, tableInterface)] = fs
-        }
-
-        // Add `OneToOne` and `OneToMany` properties
-        tables.forEach Table@{ table ->
-            // Skip table if it has no primary key
-            if (table.primaryKeys.isEmpty()) {
-                return@Table
-            }
-            table.foreignKeys.forEach ForeignKey@{ foreignKey ->
-
-                // Skip column if it is common column
-                if (commonColumns.map { it.name }.contains(foreignKey.column.name)) {
-                    return@ForeignKey
-                }
-
-                val unique = table.uniqueKeys.filter { it.columns.size == 1 }.map { it.columns.first().name }
-                    .contains(foreignKey.column.name)
-                val nullable = table.columns.first { it.name == foreignKey.column.name }.nullable
-
-                val tName = foreignKey.reference.tableName.snakeToCamelCase()
-                val pName = foreignKey.column.name.snakeToCamelCase(false).let {
-                    if (it.endsWith("Id")) it.substring(0, it.length - 2) else it
-                }
-
-                val property = if (unique) {
-                    val property =
-                        PropertySpec.builder(pName, ClassName(generator.target.packageName.get(), tName))
-                    property.addAnnotation(OneToOne::class)
-
-                    type2properties.forEach { (type, properties) ->
-                        if (type.table?.name == foreignKey.reference.tableName) {
-                            val snakeToCamelCase = table.name.snakeToCamelCase(false)
-                            properties.add(
-                                Property(
-                                    snakeToCamelCase,
-                                    null,
-                                    PropertySpec.builder(
-                                        snakeToCamelCase,
-                                        ClassName(
-                                            generator.target.packageName.get(),
-                                            table.name.snakeToCamelCase()
-                                        ).copy(nullable = true)
-                                    ).addAnnotation(
-                                        AnnotationSpec.builder(OneToOne::class)
-                                            .addMember("mappedBy = %S", pName)
-                                            .build()
-                                    )
-                                )
-                            )
-                        }
-                    }
-                    property
-                } else {
-                    val property =
-                        PropertySpec.builder(
-                            pName,
-                            ClassName(generator.target.packageName.get(), tName).copy(nullable = nullable)
-                        )
-                    property.addAnnotation(ManyToOne::class)
-
-                    type2properties.forEach { (type, properties) ->
-                        if (type.table?.name == foreignKey.reference.tableName) {
-                            val snakeToCamelCase = table.name.snakeToCamelCase(false).toPlural()
-                            properties.add(
-                                Property(
-                                    snakeToCamelCase,
-                                    null,
-                                    PropertySpec.builder(
-                                        snakeToCamelCase,
-                                        List::class.asClassName()
-                                            .parameterizedBy(
-                                                ClassName(
-                                                    generator.target.packageName.get(),
-                                                    table.name.snakeToCamelCase()
-                                                )
-                                            )
-                                    ).addAnnotation(
-                                        AnnotationSpec.builder(OneToMany::class)
-                                            .addMember("mappedBy = %S", pName)
-                                            .build()
-                                    )
-                                )
-                            )
-                        }
-                    }
-                    property
-                }
-
-                // Add property to relevant table
-                type2properties.forEach { (type, properties) ->
-                    if (type.table?.name == table.name) {
-                        properties.add(Property(pName, null, property))
-                    }
-                }
-            }
-        }
-
-        // Add `ManyToMany` and `JoinTable` properties
-        tables.filter { it.columns.size == 2 && it.foreignKeys.size == 2 }.forEach Table@{ table ->
-            val foreignKeys = table.foreignKeys.toList()
-            val f1 = foreignKeys[0]
-            val f2 = foreignKeys[1]
-
-            val t1 = f1.reference.tableName
-            val t2 = f2.reference.tableName
-
-            val p1 = f1.column.name.snakeToCamelCase(false).let {
-                if (it.endsWith("Id")) it.substring(0, it.length - 2) else it
-            }.toPlural()
-            val p2 = f2.column.name.snakeToCamelCase(false).let {
-                if (it.endsWith("Id")) it.substring(0, it.length - 2) else it
-            }.toPlural()
-
-
-            val property1 = PropertySpec.builder(
-                p1, List::class.asClassName().parameterizedBy(
-                    ClassName(generator.target.packageName.get(), t1.snakeToCamelCase())
-                )
-            )
-                .addAnnotations(
-                    listOf(
-                        AnnotationSpec.builder(ManyToMany::class).build(),
-                        AnnotationSpec.builder(JoinTable::class)
-                            .addMember("name = %S", table.name)
-                            .addMember("joinColumnName = %S", f1.column.name)
-                            .addMember("inverseJoinColumnName = %S", f2.column.name)
-                            .build()
+        // Generate base entity
+        if (commonColumns.isNotEmpty()) {
+            TypeSpec.interfaceBuilder(ClassName(packageName, BASE_ENTITY)).let {
+                it.addProperties(commonColumns.map { column ->
+                    val propertyBuilder = PropertySpec.builder(
+                        column.name.snakeToCamelCase(firstCharUppercase = false),
+                        getTypeName(kotlinTypeMappings, column)
                     )
+                    if (column.name == generator.table.primaryKey.get()) {
+                        propertyBuilder.addAnnotation(Id::class)
+                    }
+                    propertyBuilder.build()
+                })
+                it.addAnnotation(MappedSuperclass::class)
+            }.let {
+                type2Builder[BASE_ENTITY] = it
+            }
+        }
+
+        // Add fake association
+        if (generator.table.association.get() == Association.FAKE) {
+            tables.forEach { table ->
+                table.columns.filter { commonColumns.contains(it).not() }.forEach { column ->
+                    if (column.name.endsWith(idSuffix)) {
+                        val foreignKey = ForeignKey(
+                            "${table.name}_${column.name}_id_fkey",
+                            table.name,
+                            column,
+                            tables.first {
+                                it.name == column.name.substring(
+                                    0,
+                                    column.name.length - idSuffix.length
+                                )
+                            }.columns.first { it.name == generator.table.primaryKey.get() },
+                            real = false
+                        )
+
+                        if (table.foreignKeys.contains(foreignKey).not()) {
+                            table.foreignKeys.add(foreignKey)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Generate entity
+        tables.forEach { table ->
+            // Skip table without primary key
+            if (table.primaryKeys.isEmpty()) {
+                return@forEach
+            }
+
+            val typeName = table.name.snakeToCamelCase()
+            TypeSpec.interfaceBuilder(ClassName(packageName, typeName)).let { type ->
+                if (commonColumns.isNotEmpty()) type.addSuperinterface(ClassName(packageName, BASE_ENTITY))
+                // Add table columns
+                type.addProperties(table.columns
+                    .filter {
+                        // Exclude common columns
+                        commonColumns.contains(it).not()
+                    }
+                    .filter {
+                        // Exclude id column
+                        if (generator.table.idView.get().not()) it.name.endsWith(
+                            idSuffix,
+                            true
+                        ).not() else true
+                    }
+                    .map { column ->
+                        val propertyBuilder = PropertySpec.builder(
+                            column.name.snakeToCamelCase(firstCharUppercase = false),
+                            getTypeName(kotlinTypeMappings, column).copy(nullable = column.nullable)
+                        )
+
+                        if (generator.table.comment.get()) {
+                            column.remark?.let {
+                                propertyBuilder.addKdoc(it)
+                            }
+                        }
+
+                        if (column.name.endsWith(idSuffix, true)) {
+                            propertyBuilder.addAnnotation(IdView::class)
+                        }
+                        propertyBuilder.build()
+                    }
                 )
 
+                // Add table associations
+                if (generator.table.association.get() != Association.NO) {
+                    type.addProperties(table.foreignKeys.map { foreignKey ->
+                        val referenceTypeName = foreignKey.reference.tableName.snakeToCamelCase()
 
-            val property2 = PropertySpec.builder(
-                p2, List::class.asClassName().parameterizedBy(
-                    ClassName(generator.target.packageName.get(), t2.snakeToCamelCase())
-                )
-            )
-                .addAnnotation(
-                    AnnotationSpec.builder(ManyToMany::class)
-                        .addMember("mappedBy = %S", p1)
+                        val unique = table.uniqueKeys.filter { it.columns.size == 1 }.map { it.columns.first() }
+                            .contains(foreignKey.column)
+
+                        // owning side
+                        val own = PropertySpec.builder(
+                            referenceTypeName.firstCharLowercase(),
+                            ClassName(packageName, referenceTypeName).copy(nullable = foreignKey.column.nullable)
+                        ).addAnnotation(
+                            AnnotationSpec.builder(
+                                if (unique) OneToOne::class else ManyToOne::class
+                            ).build()
+                        )
+
+                        // inverse side
+                        type2Builder[referenceTypeName]?.addProperty(
+                            PropertySpec.builder(
+                                typeName.firstCharLowercase().let {
+                                    if (unique) {
+                                        it
+                                    } else {
+                                        it.toPlural()
+                                    }
+                                },
+                                if (unique) {
+                                    ClassName(packageName, typeName).copy(nullable = true)
+                                } else {
+                                    List::class.asTypeName().parameterizedBy(ClassName(packageName, typeName))
+                                }
+                            ).addAnnotation(
+                                AnnotationSpec.builder(
+                                    if (unique) OneToOne::class else OneToMany::class
+                                ).addMember("mappedBy = %S", referenceTypeName.firstCharLowercase()).build()
+                            ).build()
+                        )
+
+                        own.build()
+                    })
+                }
+
+                type.addAnnotation(Entity::class)
+                type.addAnnotation(
+                    AnnotationSpec.builder(Table::class)
+                        .addMember("name = %S", table.name)
                         .build()
                 )
-
-
-            type2properties.forEach { (type, properties) ->
-                if (type.table?.name == t1) {
-                    properties.add(Property(p1, null, property2))
-                }
-                if (type.table?.name == t2) {
-                    properties.add(Property(p2, null, property1))
-                }
+            }.let {
+                type2Builder[typeName] = it
             }
         }
 
-        if (commonColumns.isNotEmpty()) {
-            // Add BaseEntity
-            val baseEntity = Type(
-                "BaseEntity", null,
-                TypeSpec.interfaceBuilder("BaseEntity").addAnnotation(MappedSuperclass::class)
-            )
+        // Generate many-to-many association table
+        if (generator.table.association.get() != Association.NO) {
+            tables.forEach { table ->
+                // If the table has two columns and two foreign keys, it is a many-to-many association table
+                if (table.columns.size != 2 || table.foreignKeys.size != 2) return@forEach
 
-            val baseEntityProperties = CopyOnWriteArrayList<Property>()
-            commonColumns.forEach { column ->
-                val pName = column.name.snakeToCamelCase(false)
-                val property = PropertySpec.builder(pName, getTypeName(generator.typeMappings.get(), column))
 
-                // Add column comment if comment is enabled
-                if (generator.optional.comment.get()) {
-                    column.remark?.let {
-                        property.addKdoc(it)
-                    }
-                }
+                val owningColumn = table.foreignKeys.first().column
+                val inverseColumn = table.foreignKeys.last().column
 
-                baseEntityProperties.add(Property(pName, column, property))
-            }
-            type2properties[baseEntity] = baseEntityProperties
-        }
+                val owningTypeName = table.foreignKeys.first().reference.tableName.snakeToCamelCase()
+                val inverseTypeName = table.foreignKeys.last().reference.tableName.snakeToCamelCase()
 
-        // Add or remove some properties for entity, such as `BaseEntity` superinterface, `commonColumns`, `idView`, `comment` etc.
-        type2properties.forEach type@{ (type, properties) ->
-            type.table ?: return@type
+                type2Builder[owningTypeName]?.addProperty(
+                    PropertySpec.builder(
+                        inverseTypeName.firstCharLowercase().toPlural(),
+                        List::class.asTypeName().parameterizedBy(ClassName(packageName, inverseTypeName))
+                    )
+                        .addAnnotation(ManyToMany::class)
+                        .addAnnotation(
+                            AnnotationSpec.builder(JoinTable::class)
+                                .addMember("name = %S", table.name)
+                                .addMember("joinColumns = [%T(name = %S)]", JoinColumn::class, owningColumn.name)
+                                .addMember(
+                                    "inverseJoinColumns = [%T(name = %S)]",
+                                    JoinColumn::class,
+                                    inverseColumn.name
+                                )
+                                .build()
+                        ).build()
+                )
 
-            type.builder.addAnnotation(Entity::class)
-            type.builder.addAnnotation(
-                AnnotationSpec.builder(
-                    org.babyfish.jimmer.sql.Table::class
-                ).addMember("name = %S", type.table.name).build()
-            )
-
-            // Add BaseEntity superinterface
-            if (commonColumns.isNotEmpty()) {
-                type.builder.addSuperinterface(ClassName(generator.target.packageName.get(), "BaseEntity"))
-            }
-
-            properties.forEach property@{ property ->
-                property.column ?: return@property
-                // Remove relevant columns if idView is disabled
-                val rk = type.table.foreignKeys.map { it.column.name }.contains(property.column.name)
-                if (generator.optional.idView.get().not() && rk) {
-                    properties.remove(property)
-                }
-
-                // Add idView annotation if idView is enabled
-                if (generator.optional.idView.get() && rk) {
-                    property.builder.addAnnotation(IdView::class)
-                }
-
-                // Add column comment if comment is enabled
-                if (generator.optional.comment.get()) {
-                    property.column.remark?.let {
-                        property.builder.addKdoc(it)
-                    }
-                }
+                type2Builder[inverseTypeName]?.addProperty(
+                    PropertySpec.builder(
+                        owningTypeName.firstCharLowercase().toPlural(),
+                        List::class.asTypeName().parameterizedBy(ClassName(packageName, owningTypeName))
+                    ).addAnnotation(
+                        AnnotationSpec.builder(ManyToMany::class)
+                            .addMember("mappedBy = %S", inverseTypeName.firstCharLowercase().toPlural())
+                            .build()
+                    ).build()
+                )
             }
         }
 
-        return type2properties.map {
-            val file = FileSpec.builder(generator.target.packageName.get(), it.key.name)
+        // Write to file
+        for ((tableName, typeBuilder) in type2Builder) {
+            FileSpec.builder(packageName, tableName)
                 .indent(generator.poet.indent.get())
-            it.value.forEach { p ->
-                it.key.builder.addProperty(p.builder.build())
-            }
-            file.addType(it.key.builder.build())
-            Path(
-                generator.target.srcDir.get(),
-                generator.target.packageName.get().replace(".", "/"),
-                "${it.key.name}.kt"
-            ) to file.build().toString()
-        }.toMap()
+                .addType(typeBuilder.build()).build()
+                .writeTo(project.projectDir.resolve(generator.target.srcDir.get()))
+        }
     }
 
     private fun getTypeName(typeMappings: Map<String, String>, column: Column): TypeName {
@@ -313,7 +257,4 @@ class KotlinEntityGenerateService : EntityGenerateService {
             }
             ?: String::class.asTypeName().copy(nullable = column.nullable)
     }
-
-    class Type(val name: String, val table: Table?, val builder: TypeSpec.Builder)
-    class Property(val name: String, val column: Column?, val builder: PropertySpec.Builder)
 }

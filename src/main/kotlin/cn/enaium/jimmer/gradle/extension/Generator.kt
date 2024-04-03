@@ -16,9 +16,7 @@
 
 package cn.enaium.jimmer.gradle.extension
 
-import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
 import javax.inject.Inject
 
 /**
@@ -27,24 +25,23 @@ import javax.inject.Inject
 open class Generator @Inject constructor(objects: ObjectFactory) {
     internal val target: Target = objects.newInstance(Target::class.java)
     internal val jdbc: JDBC = objects.newInstance(JDBC::class.java)
-    internal val optional: Optional = objects.newInstance(Optional::class.java)
-    val typeMappings: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
+    internal val table: Table = objects.newInstance(Table::class.java)
     internal val poet: Poet = objects.newInstance(Poet::class.java)
 
 
-    fun target(action: Action<Target>) {
-        action.execute(target)
+    fun target(action: Target.() -> Unit) {
+        action.invoke(target)
     }
 
-    fun jdbc(action: Action<JDBC>) {
-        action.execute(jdbc)
+    fun jdbc(action: JDBC.() -> Unit) {
+        action.invoke(jdbc)
     }
 
-    fun optional(action: Action<Optional>) {
-        action.execute(optional)
+    fun table(action: Table.() -> Unit) {
+        action.invoke(table)
     }
 
-    fun poet(action: Action<Poet>) {
-        action.execute(poet)
+    fun poet(action: Poet.() -> Unit) {
+        action.invoke(poet)
     }
 }

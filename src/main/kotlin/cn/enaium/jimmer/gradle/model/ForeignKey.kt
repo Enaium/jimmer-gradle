@@ -23,7 +23,8 @@ data class ForeignKey(
     val name: String,
     val tableName: String,
     val column: Column,
-    val reference: Column
+    val reference: Column,
+    val real: Boolean = true
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

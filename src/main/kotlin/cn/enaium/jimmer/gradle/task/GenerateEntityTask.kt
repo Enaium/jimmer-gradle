@@ -42,9 +42,9 @@ open class GenerateEntityTask : DefaultTask() {
         val generator = extension.generator
 
         if (extension.language.get() == Language.KOTLIN) {
-            generator.typeMappings.convention(kotlinTypeMappings)
+            kotlinTypeMappings.putAll(generator.table.typeMappings.get())
         } else if (extension.language.get() == Language.JAVA) {
-            generator.typeMappings.convention(javaTypeMappings)
+            javaTypeMappings.putAll(generator.table.typeMappings.get())
         }
 
         val classloader = project.configurations.named("runtimeClasspath").get()
@@ -60,17 +60,12 @@ open class GenerateEntityTask : DefaultTask() {
             )
         )
 
-        val generateEntityService = if (extension.language.get() == Language.KOTLIN) {
-            KotlinEntityGenerateService()
+        if (extension.language.get() == Language.KOTLIN) {
+            KotlinEntityGenerateService().generate(project, generator)
         } else if (extension.language.get() == Language.JAVA) {
-            JavaEntityGenerateService()
+            JavaEntityGenerateService().generate(project, generator)
         } else {
             throw RuntimeException("Unknown language ${extension.language}")
-        }
-        generateEntityService.generate(extension.generator).forEach { (relative, content) ->
-            val toFile = project.projectDir.toPath().resolve(relative).toFile()
-            toFile.parentFile.mkdirs()
-            toFile.writeText(content, Charsets.UTF_8)
         }
     }
 }

@@ -5,7 +5,7 @@
 
 Feature:
 
-- Generate code for database table and column.
+- Generate code for database table, column and association.
 - Incremental compile for dto language (apt/ksp).
 - implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
 - annotationProcessor/ksp for dependencies.
@@ -27,9 +27,13 @@ jimmer {
 ![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
 
+### full config
+
 ```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
+
+import cn.enaium.jimmer.gradle.extension.Association
 import cn.enaium.jimmer.gradle.extension.Driver
+import cn.enaium.jimmer.gradle.extension.Language
 
 plugins {
     //...
@@ -42,21 +46,68 @@ dependencies {
 }
 
 jimmer {
-    language.set(Language.KOTLIN)//Language.JAVA
+    language.set(Language.KOTLIN)//Language.KOTLIN,Language.JAVA, no default, so you must set it
     generator {
         target {
             srcDir.set("src/main/kotlin")
             packageName.set("cn.enaium")
         }
         jdbc {
-            driver.set(Driver.POSTGRESQL)//Driver.MARIADB,Driver.MYSQL
+            driver.set(Driver.POSTGRESQL)//Driver.POSTGRESQL,Driver.MARIADB,Driver.MYSQL, no default
             url.set("jdbc:postgresql://localhost:5432/postgres")
             username.set("postgres")
             password.set("postgres")
         }
-        optional {
+        table {
             idView.set(true)
             comment.set(true)
+            primaryKey.set("id")//default id
+            association.set(Association.REAL)//Association.REAL,Association.FAKE,Association.NO, default Association.REAL
+            typeMappings.set(
+                mapOf(
+                    "float8" to "kotlin.Float",
+                )
+            )
+        }
+    }
+}
+```
+
+### association
+
+You must add the suffix '_id'(`primaryKey.set("id")`) to the column name if the column is a fake foreign key, otherwise
+the column cannot be recognized as a foreign key.
+
+If you want to use the fake foreign key, you need to set the `association.set(Association.FAKE)`, otherwise the default
+is `association.set(Association.REAL)`, of course you can also set `association.set(Association.NO)` to disable the
+association.
+
+**Warning: You can't use the fake association if you included the real association in the database.**
+
+```kotlin
+jimmer {
+    generator {
+        table {
+            primaryKey.set("id")
+            association.set(Association.REAL)
+        }
+    }
+}
+```
+
+### typeMappings
+
+You can customize the type mapping, the default is as follows:
+
+```kotlin
+jimmer {
+    generator {
+        table {
+            typeMappings.set(
+                mapOf(
+                    "float8" to "kotlin.Float",//Java: "java.lang.Float"
+                )
+            )
         }
     }
 }

@@ -76,7 +76,7 @@ fun DatabaseMetaData.getPrimaryKeys(tableName: String): Set<PrimaryKey> {
     }
 }
 
-fun DatabaseMetaData.getForeignKeys(tableName: String): Set<ForeignKey> {
+fun DatabaseMetaData.getForeignKeys(tableName: String): MutableSet<ForeignKey> {
     return getImportedKeys(null, null, tableName).use { foreignKey ->
         val foreignKeys = mutableSetOf<ForeignKey>()
         while (foreignKey.next()) {

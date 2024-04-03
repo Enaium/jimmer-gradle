@@ -22,7 +22,7 @@ jimmer {
             username.set("${username}")
             password.set("${password}")
         }
-        optional {
+        table {
             idView.set(true)
         }
     }
