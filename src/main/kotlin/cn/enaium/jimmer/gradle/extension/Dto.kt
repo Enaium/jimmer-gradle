@@ -16,11 +16,15 @@
 
 package cn.enaium.jimmer.gradle.extension
 
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
+import javax.inject.Inject
+
 /**
  * @author Enaium
  */
-enum class Association {
-    NO,
-    REAL,
-    FAKE
+open class Dto @Inject constructor(objects: ObjectFactory) {
+    val dirs: ListProperty<String> = objects.listProperty(String::class.java)
+    val testDirs: ListProperty<String> = objects.listProperty(String::class.java)
+    val mutable = objects.property(Boolean::class.java)
 }

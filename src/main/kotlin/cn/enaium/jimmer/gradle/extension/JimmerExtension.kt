@@ -25,11 +25,32 @@ import javax.inject.Inject
  */
 open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
     internal val generator: Generator = objects.newInstance(Generator::class.java)
+    internal val client: Client = objects.newInstance(Client::class.java)
+    internal val dto: Dto = objects.newInstance(Dto::class.java)
+    internal val entry: Entry = objects.newInstance(Entry::class.java)
+    internal val source: Source = objects.newInstance(Source::class.java)
     val language: Property<Language> = objects.property(Language::class.java)
     val version: Property<String> = objects.property(String::class.java).convention("+")
+    val keepIsPrefix: Property<Boolean> = objects.property(Boolean::class.java)
 
     fun generator(action: Generator.() -> Unit) {
         action.invoke(generator)
+    }
+
+    fun client(action: Client.() -> Unit) {
+        action.invoke(client)
+    }
+
+    fun dto(action: Dto.() -> Unit) {
+        action.invoke(dto)
+    }
+
+    fun entry(action: Entry.() -> Unit) {
+        action.invoke(entry)
+    }
+
+    fun source(action: Source.() -> Unit) {
+        action.invoke(source)
     }
 }
 

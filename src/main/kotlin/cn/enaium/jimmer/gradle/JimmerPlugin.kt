@@ -19,6 +19,7 @@ package cn.enaium.jimmer.gradle
 import cn.enaium.jimmer.gradle.extension.JimmerExtension
 import cn.enaium.jimmer.gradle.extension.Language
 import cn.enaium.jimmer.gradle.task.GenerateEntityTask
+import cn.enaium.jimmer.gradle.utility.*
 import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -34,6 +35,81 @@ class JimmerPlugin : Plugin<Project> {
         project.afterEvaluate { afterProject ->
             afterProject.tasks.create("generateEntity", GenerateEntityTask::class.java) {
                 it.group = "jimmer"
+            }
+
+            if (extension.language.get() == Language.JAVA) {
+                afterProject.tasks.withType(JavaCompile::class.java) { compile ->
+
+                    fun add(key: String, value: String) {
+                        compile.options.compilerArgs.add("-A$key=$value")
+                    }
+
+                    extension.keepIsPrefix.takeIf { it.isPresent }?.let {
+                        add(KEEP_IS_PREFIX, it.get().toString())
+                    }
+
+                    extension.source.includes.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
+                        add(SOURCE_INCLUDES, it.get().joinToString(","))
+                    }
+
+                    extension.source.excludes.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
+                        add(SOURCE_EXCLUDES, it.get().joinToString(","))
+                    }
+
+                    extension.dto.dirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
+                        add(DTO_DIRS, it.get().joinToString(","))
+                    }
+
+                    extension.dto.testDirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
+                        add(DTO_TEST_DIRS, it.get().joinToString(","))
+                    }
+
+                    extension.client.checkedException.takeIf { it.isPresent }?.let {
+                        add(CLIENT_CHECKED_EXCEPTION, it.get().toString())
+                    }
+
+                    extension.client.ignoreJdkWarning.takeIf { it.isPresent }?.let {
+                        add(CLIENT_IGNORE_JDK_WARNING, it.get().toString())
+                    }
+
+                    extension.entry.objects.takeIf { it.isPresent }?.let {
+                        add(ENTRY_OBJECTS, it.get())
+                    }
+
+                    extension.entry.tables.takeIf { it.isPresent }?.let {
+                        add(ENTRY_TABLES, it.get())
+                    }
+
+                    extension.entry.tableExes.takeIf { it.isPresent }?.let {
+                        add(ENTRY_TABLE_EXES, it.get())
+                    }
+
+                    extension.entry.fetchers.takeIf { it.isPresent }?.let {
+                        add(ENTRY_FETCHERS, it.get())
+                    }
+                }
+            } else if (extension.language.get() == Language.KOTLIN) {
+                afterProject.extensions.getByType(KspExtension::class.java).arguments
+
+                fun add(key: String, value: String) {
+                    afterProject.extensions.getByType(KspExtension::class.java).arg(key, value)
+                }
+
+                extension.dto.dirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
+                    add(DTO_DIRS, it.get().toString())
+                }
+
+                extension.dto.testDirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
+                    add(DTO_TEST_DIRS, it.get().toString())
+                }
+
+                extension.dto.mutable.takeIf { it.isPresent }?.let {
+                    add(DTO_MUTABLE, it.get().toString())
+                }
+
+                extension.client.checkedException.takeIf { it.isPresent }?.let {
+                    add(CLIENT_CHECKED_EXCEPTION, it.get().toString())
+                }
             }
 
             if (afterProject.tasks.names.contains("compileJava") && extension.language.get() == Language.JAVA) {

@@ -16,11 +16,16 @@
 
 package cn.enaium.jimmer.gradle.extension
 
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import javax.inject.Inject
+
 /**
  * @author Enaium
  */
-enum class Association {
-    NO,
-    REAL,
-    FAKE
+open class Entry @Inject constructor(objects: ObjectFactory) {
+    val objects: Property<String> = objects.property(String::class.java)
+    val tables: Property<String> = objects.property(String::class.java)
+    val tableExes: Property<String> = objects.property(String::class.java)
+    val fetchers: Property<String> = objects.property(String::class.java)
 }

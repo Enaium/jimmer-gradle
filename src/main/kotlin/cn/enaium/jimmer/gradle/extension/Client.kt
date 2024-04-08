@@ -16,11 +16,14 @@
 
 package cn.enaium.jimmer.gradle.extension
 
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import javax.inject.Inject
+
 /**
  * @author Enaium
  */
-enum class Association {
-    NO,
-    REAL,
-    FAKE
+open class Client @Inject constructor(objects: ObjectFactory) {
+    val checkedException: Property<Boolean> = objects.property(Boolean::class.java)
+    val ignoreJdkWarning: Property<Boolean> = objects.property(Boolean::class.java)
 }

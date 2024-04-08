@@ -9,6 +9,7 @@ Feature:
 - Incremental compile for dto language (apt/ksp).
 - implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
 - annotationProcessor/ksp for dependencies.
+- Easy to add arguments for annotationProcessor/ksp.
 
 ## version
 
@@ -161,7 +162,7 @@ jimmer {
 
 ## annotationProcessor/ksp for dependencies
 
-## ksp
+### ksp
 
 ```kotlin
 import cn.enaium.jimmer.gradle.extension.Language
@@ -175,12 +176,22 @@ jimmer {
 }
 ```
 
-## annotationProcessor
+### annotationProcessor
 
 ```kotlin
 import cn.enaium.jimmer.gradle.extension.Language
 
 jimmer {
     language = Language.JAVA
+}
+```
+
+## annotationProcessor/ksp arguments
+
+```kotlin
+jimmer {
+    entry {
+        objects.set("Drafts")//equal to -Ajimmer.entry.objects=Drafts
+    }
 }
 ```

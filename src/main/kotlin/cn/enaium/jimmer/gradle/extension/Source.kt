@@ -16,11 +16,14 @@
 
 package cn.enaium.jimmer.gradle.extension
 
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
+import javax.inject.Inject
+
 /**
  * @author Enaium
  */
-enum class Association {
-    NO,
-    REAL,
-    FAKE
+open class Source @Inject constructor(objects: ObjectFactory) {
+    val includes: ListProperty<String> = objects.listProperty(String::class.java)
+    val excludes: ListProperty<String> = objects.listProperty(String::class.java)
 }
