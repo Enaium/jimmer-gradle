@@ -26,6 +26,7 @@ import java.util.*
  * @author Enaium
  */
 internal val kotlinTypeMappings = mutableMapOf(
+    "tinyint" to Byte::class.qualifiedName!!,
     "smallint" to Short::class.qualifiedName!!,
     "integer" to Int::class.qualifiedName!!,
     "bigint" to Long::class.qualifiedName!!,
@@ -43,6 +44,7 @@ internal val kotlinTypeMappings = mutableMapOf(
 )
 
 internal val javaTypeMappings = mutableMapOf(
+    "tinyint" to java.lang.Byte::class.java.name,
     "smallint" to java.lang.Short::class.java.name,
     "integer" to java.lang.Integer::class.java.name,
     "bigint" to java.lang.Long::class.java.name,

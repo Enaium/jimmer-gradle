@@ -1,19 +1,19 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
     id("com.gradle.plugin-publish") version "1.2.1"
     `java-gradle-plugin`
     `maven-publish`
 }
 
 group = "cn.enaium"
-version = "0.0.8"
+version = "0.0.9"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.9.23-1.0.19")
+    compileOnly("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.9.23-1.0.20")
 
     implementation("com.squareup:kotlinpoet:${property("kotlinpoet")}")
     implementation("com.squareup:javapoet:${property("javapoet")}")

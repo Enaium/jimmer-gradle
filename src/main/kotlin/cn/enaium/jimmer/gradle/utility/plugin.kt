@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package cn.enaium.jimmer.gradle.extension
+package cn.enaium.jimmer.gradle.utility
 
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import javax.inject.Inject
+import org.gradle.api.plugins.PluginContainer
 
 /**
  * @author Enaium
  */
-open class Dto @Inject constructor(objects: ObjectFactory) {
-    val dirs: ListProperty<String> = objects.listProperty(String::class.java)
-    val testDirs: ListProperty<String> = objects.listProperty(String::class.java)
-    val mutable: Property<Boolean> = objects.property(Boolean::class.java)
-}
+val PluginContainer.hasJava: Boolean
+    get() = hasPlugin("java")
+
+val PluginContainer.hasKotlin: Boolean
+    get() = hasPlugin("org.jetbrains.kotlin.jvm")
+
+val PluginContainer.hasKsp: Boolean
+    get() = hasPlugin(KSP_PLUGIN_ID)
+
+val PluginContainer.hasSpringBoot: Boolean
+    get() = hasPlugin(SPRINGBOOT_PLUGIN_ID)

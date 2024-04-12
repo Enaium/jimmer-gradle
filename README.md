@@ -15,7 +15,7 @@ Feature:
 
 ```kotlin
 jimmer {
-    version.set("0.8.107")//default latest
+    version.set("0.8.122")//default latest
 }
 ```
 
@@ -28,10 +28,7 @@ jimmer {
 ![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
 
-### full config
-
 ```kotlin
-
 import cn.enaium.jimmer.gradle.extension.Association
 import cn.enaium.jimmer.gradle.extension.Driver
 import cn.enaium.jimmer.gradle.extension.Language
@@ -47,7 +44,7 @@ dependencies {
 }
 
 jimmer {
-    language.set(Language.KOTLIN)//Language.KOTLIN,Language.JAVA, no default, so you must set it
+    language.set(Language.KOTLIN)//Language.KOTLIN,Language.JAVA, auto detect if you don't set
     generator {
         target {
             srcDir.set("src/main/kotlin")
@@ -97,6 +94,8 @@ jimmer {
 ```
 
 ### typeMappings
+
+[default](src/main/kotlin/cn/enaium/jimmer/gradle/utility/mapping.kt)
 
 You can customize the type mapping, the default is as follows:
 
@@ -195,3 +194,40 @@ jimmer {
     }
 }
 ```
+
+## extension
+
+| extension                      | type                                            | default                  | description                                 |
+|--------------------------------|-------------------------------------------------|--------------------------|---------------------------------------------|
+| `language`                     | `cn.enaium.jimmer.gradle.extension.Language`    | Auto detect              | Your project language.                      |
+| `version`                      | `String`                                        | `+`                      | Jimmer version.                             |
+| `keepIsPrefix`                 | `Boolean`                                       | `false`                  | Keep 'is' prefix in getter method.          |
+| `generator`                    | `cn.enaium.jimmer.gradle.extension.Generator`   |                          | Entity generator.                           |
+| `generator.target`             | `cn.enaium.jimmer.gradle.extension.Target`      |                          | Entity generator target.                    |
+| `generator.target.srcDir`      | `String`                                        |                          | Entity generator target src dir.            |
+| `generator.target.packageName` | `String`                                        |                          | Entity generator target package.            |
+| `generator.jdbc`               | `cn.enaium.jimmer.gradle.extension.Jdbc`        |                          | For database connection.                    |
+| `generator.jdbc.driver`        | `cn.enaium.jimmer.gradle.extension.Driver`      |                          | Database driver.                            |
+| `generator.jdbc.url`           | `String`                                        |                          | Database url.                               |
+| `generator.jdbc.username`      | `String`                                        |                          | Database username.                          |
+| `generator.jdbc.password`      | `String`                                        |                          | Database password.                          |
+| `generator.table`              | `cn.enaium.jimmer.gradle.extension.Table`       |                          | Table rule.                                 |
+| `generator.table.primaryKey`   | `String`                                        | `id`                     | Table primary key name.                     |
+| `generator.table.asociation`   | `cn.enaium.jimmer.gradle.extension.Association` | `REAL`                   | Table association rule.                     |
+| `generator.table.typeMappings` | `Map<String, String>`                           | [default](#typemappings) | Column type mapping.                        |
+| `generator.table.comment`      | `Boolean`                                       | `false`                  | Generate table comment.                     |
+| `generator.table.idView`       | `Boolean`                                       | `false`                  | Generate id view.                           |
+| `generator.poet`               | `cn.enaium.jimmer.gradle.extension.Poet`        |                          | Poet rule.                                  |
+| `generator.poet.indent`        | `String`                                        | Four spaces              | Poet indent.                                |
+| `client.checkedExceptions`     | `Boolean`                                       |                          |                                             |
+| `client.ignoreJdkWarning`      | `Boolean`                                       |                          | Java only.                                  |
+| `dto.dirs`                     | `List<String>`                                  |                          |                                             |
+| `dto.testDirs`                 | `List<String>`                                  |                          |                                             |
+| `dto.mutable`                  | `Boolean`                                       |                          | Kotlin only.                                |
+| `entry`                        | `cn.enaium.jimmer.gradle.extension.Entry`       |                          | Java only.                                  |
+| `entry.objects`                | `String`                                        |                          | Generate `objects` class name, java only.   |
+| `entry.tables`                 | `String`                                        |                          | Generate `tables` class name, java only.    |
+| `entry.tableExes`              | `String`                                        |                          | Generate `tableExes` class name, java only. |
+| `entry.fetchers`               | `String`                                        |                          | Generate `fetchers` class name, java only.  |
+| `source.includes`              | `List<String>`                                  |                          | Java only.                                  |
+| `source.excludes`              | `List<String>`                                  |                          | Java only.                                  |

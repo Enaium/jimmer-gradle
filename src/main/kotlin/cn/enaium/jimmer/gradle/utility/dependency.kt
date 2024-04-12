@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package cn.enaium.jimmer.gradle.extension
+package cn.enaium.jimmer.gradle.utility
 
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import javax.inject.Inject
+import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.internal.tasks.JvmConstants
 
 /**
  * @author Enaium
  */
-open class Dto @Inject constructor(objects: ObjectFactory) {
-    val dirs: ListProperty<String> = objects.listProperty(String::class.java)
-    val testDirs: ListProperty<String> = objects.listProperty(String::class.java)
-    val mutable: Property<Boolean> = objects.property(Boolean::class.java)
+fun DependencyHandler.implementation(dependency: String) {
+    add(JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME, dependency)
+}
+
+fun DependencyHandler.annotationProcessor(dependency: String) {
+    add(JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME, dependency)
+}
+
+fun DependencyHandler.ksp(dependency: String) {
+    add("ksp", dependency)
 }

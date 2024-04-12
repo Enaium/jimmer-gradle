@@ -20,7 +20,6 @@ import cn.enaium.jimmer.gradle.extension.JimmerExtension
 import cn.enaium.jimmer.gradle.extension.Language
 import cn.enaium.jimmer.gradle.task.GenerateEntityTask
 import cn.enaium.jimmer.gradle.utility.*
-import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
@@ -31,6 +30,18 @@ import org.gradle.api.tasks.compile.JavaCompile
 class JimmerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create("jimmer", JimmerExtension::class.java)
+
+        project.afterEvaluate { afterProject ->
+            if (!extension.language.isPresent) {
+                if (afterProject.plugins.hasJava) {
+                    extension.language.set(Language.JAVA)
+                }
+
+                if (afterProject.plugins.hasKotlin) {
+                    extension.language.set(Language.KOTLIN)
+                }
+            }
+        }
 
         project.afterEvaluate { afterProject ->
             afterProject.tasks.create("generateEntity", GenerateEntityTask::class.java) {
@@ -88,11 +99,9 @@ class JimmerPlugin : Plugin<Project> {
                         add(ENTRY_FETCHERS, it.get())
                     }
                 }
-            } else if (extension.language.get() == Language.KOTLIN) {
-                afterProject.extensions.getByType(KspExtension::class.java).arguments
-
+            } else if (afterProject.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
                 fun add(key: String, value: String) {
-                    afterProject.extensions.getByType(KspExtension::class.java).arg(key, value)
+                    afterProject.extensions.ksp.arg(key, value)
                 }
 
                 extension.dto.dirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
@@ -112,10 +121,10 @@ class JimmerPlugin : Plugin<Project> {
                 }
             }
 
-            if (afterProject.tasks.names.contains("compileJava") && extension.language.get() == Language.JAVA) {
-                afterProject.tasks.withType(JavaCompile::class.java) { compile ->
+            if (afterProject.tasks.hasCompileJava && extension.language.get() == Language.JAVA) {
+                afterProject.tasks.compileJava { compile ->
                     compile.options.compilerArgs.firstOrNull {
-                        it.startsWith("-Ajimmer.dto.dirs=")
+                        it.startsWith("-A$DTO_DIRS=")
                     }?.let {
                         val dirs = it.split("=")[1]
                         for (path in dirs.trim().split("\\*[,:;]\\s*".toRegex())) {
@@ -142,9 +151,9 @@ class JimmerPlugin : Plugin<Project> {
                 }
             }
 
-            if (afterProject.tasks.names.contains("kspKotlin") && extension.language.get() == Language.KOTLIN) {
-                afterProject.tasks.getByName("kspKotlin") { kspKotlin ->
-                    afterProject.extensions.getByType(KspExtension::class.java).arguments["jimmer.dto.dirs"]?.let { dirs ->
+            if (afterProject.tasks.hasKsp && extension.language.get() == Language.KOTLIN) {
+                afterProject.tasks.kspKotlin { kspKotlin ->
+                    afterProject.extensions.ksp.arguments[DTO_DIRS]?.let { dirs ->
                         dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
                             when {
                                 it == "" || it == "/" -> null
@@ -165,36 +174,31 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             // Add spring-boot-starter,sql,sql-kotlin
-            if (afterProject.plugins.hasPlugin("org.springframework.boot")) {
-                afterProject.dependencies.add(
-                    "implementation",
+            if (afterProject.plugins.hasSpringBoot) {
+                afterProject.dependencies.implementation(
                     "org.babyfish.jimmer:jimmer-spring-boot-starter:${extension.version.get()}"
                 )
             } else if (extension.language.get() == Language.JAVA) {
-                afterProject.dependencies.add(
-                    "implementation",
+                afterProject.dependencies.implementation(
                     "org.babyfish.jimmer:jimmer-sql:${extension.version.get()}"
                 )
             } else if (extension.language.get() == Language.KOTLIN) {
-                afterProject.dependencies.add(
-                    "implementation",
+                afterProject.dependencies.implementation(
                     "org.babyfish.jimmer:jimmer-sql-kotlin:${extension.version.get()}"
                 )
             }
 
             // Add apt
-            if (project.plugins.hasPlugin("java")) {
-                project.dependencies.add(
-                    "annotationProcessor",
+            if (project.plugins.hasJava) {
+                project.dependencies.annotationProcessor(
                     "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
                 )
             }
         }
 
         // Add ksp
-        if (project.plugins.hasPlugin("com.google.devtools.ksp")) {
-            project.dependencies.add(
-                "ksp",
+        if (project.plugins.hasKsp) {
+            project.dependencies.ksp(
                 "org.babyfish.jimmer:jimmer-ksp:${extension.version.get()}"
             )
         }
