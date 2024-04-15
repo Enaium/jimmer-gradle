@@ -24,11 +24,11 @@ import javax.inject.Inject
  * @author Enaium
  */
 open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
-    internal val generator: Generator = objects.newInstance(Generator::class.java)
-    internal val client: Client = objects.newInstance(Client::class.java)
-    internal val dto: Dto = objects.newInstance(Dto::class.java)
-    internal val entry: Entry = objects.newInstance(Entry::class.java)
-    internal val source: Source = objects.newInstance(Source::class.java)
+    val generator: Generator = objects.newInstance(Generator::class.java)
+    val client: Client = objects.newInstance(Client::class.java)
+    val dto: Dto = objects.newInstance(Dto::class.java)
+    val entry: Entry = objects.newInstance(Entry::class.java)
+    val source: Source = objects.newInstance(Source::class.java)
     val language: Property<Language> = objects.property(Language::class.java)
     val version: Property<String> = objects.property(String::class.java).convention("+")
     val keepIsPrefix: Property<Boolean> = objects.property(Boolean::class.java)

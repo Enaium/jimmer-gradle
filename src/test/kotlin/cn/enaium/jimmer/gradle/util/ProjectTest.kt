@@ -33,9 +33,13 @@ class ProjectTest(private val name: String) {
             val text = it.readText(Charsets.UTF_8)
 
             tempFile.writeText(stringMap.entries.fold(text) { acc, entry ->
-                acc.replace("${'$'}{${entry.key}}", entry.value)
+                acc.replace("%{${entry.key}}", entry.value)
             })
         }
+    }
+
+    fun clear() {
+        testProjectDir.deleteRecursively()
     }
 
     fun create(
@@ -51,7 +55,7 @@ class ProjectTest(private val name: String) {
             "fail",
             "--gradle-user-home",
             File(System.getProperty("user.home"), ".gradle").absolutePath,
-        ).withPluginClasspath().withGradleVersion(GradleVersion.current().version).forwardOutput().withDebug(true)
+        ).withGradleVersion(GradleVersion.current().version).forwardOutput().withDebug(true)
             .build()
     }
 }

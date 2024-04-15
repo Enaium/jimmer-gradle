@@ -23,10 +23,10 @@ import javax.inject.Inject
  * @author Enaium
  */
 open class Generator @Inject constructor(objects: ObjectFactory) {
-    internal val target: Target = objects.newInstance(Target::class.java)
-    internal val jdbc: JDBC = objects.newInstance(JDBC::class.java)
-    internal val table: Table = objects.newInstance(Table::class.java)
-    internal val poet: Poet = objects.newInstance(Poet::class.java)
+    val target: Target = objects.newInstance(Target::class.java)
+    val jdbc: JDBC = objects.newInstance(JDBC::class.java)
+    val table: Table = objects.newInstance(Table::class.java)
+    val poet: Poet = objects.newInstance(Poet::class.java)
 
 
     fun target(action: Target.() -> Unit) {

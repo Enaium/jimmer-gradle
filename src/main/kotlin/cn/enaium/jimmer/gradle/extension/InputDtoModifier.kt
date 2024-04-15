@@ -16,17 +16,12 @@
 
 package cn.enaium.jimmer.gradle.extension
 
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import javax.inject.Inject
-
 /**
  * @author Enaium
  */
-open class Dto @Inject constructor(objects: ObjectFactory) {
-    val dirs: ListProperty<String> = objects.listProperty(String::class.java)
-    val testDirs: ListProperty<String> = objects.listProperty(String::class.java)
-    val mutable: Property<Boolean> = objects.property(Boolean::class.java)
-    val defaultNullableInputModifier: Property<InputDtoModifier> = objects.property(InputDtoModifier::class.java)
+enum class InputDtoModifier {
+    FIXED,
+    STATIC,
+    DYNAMIC,
+    FUZZY
 }

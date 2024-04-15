@@ -49,7 +49,7 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             if (extension.language.get() == Language.JAVA) {
-                afterProject.tasks.withType(JavaCompile::class.java) { compile ->
+                afterProject.tasks.compileJava { compile ->
 
                     fun add(key: String, value: String) {
                         compile.options.compilerArgs.add("-A$key=$value")
@@ -73,6 +73,10 @@ class JimmerPlugin : Plugin<Project> {
 
                     extension.dto.testDirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
                         add(DTO_TEST_DIRS, it.get().joinToString(","))
+                    }
+
+                    extension.dto.defaultNullableInputModifier.takeIf { it.isPresent }?.let {
+                        add(DTO_DEFAULT_NULLABLE_INPUT_MODIFIER, it.get().name.lowercase())
                     }
 
                     extension.client.checkedException.takeIf { it.isPresent }?.let {
@@ -105,15 +109,19 @@ class JimmerPlugin : Plugin<Project> {
                 }
 
                 extension.dto.dirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
-                    add(DTO_DIRS, it.get().toString())
+                    add(DTO_DIRS, it.get().joinToString(","))
                 }
 
                 extension.dto.testDirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
-                    add(DTO_TEST_DIRS, it.get().toString())
+                    add(DTO_TEST_DIRS, it.get().joinToString(","))
                 }
 
                 extension.dto.mutable.takeIf { it.isPresent }?.let {
                     add(DTO_MUTABLE, it.get().toString())
+                }
+
+                extension.dto.defaultNullableInputModifier.takeIf { it.isPresent }?.let {
+                    add(DTO_DEFAULT_NULLABLE_INPUT_MODIFIER, it.get().name.lowercase())
                 }
 
                 extension.client.checkedException.takeIf { it.isPresent }?.let {
