@@ -31,7 +31,6 @@ jimmer {
 ```kotlin
 import cn.enaium.jimmer.gradle.extension.Association
 import cn.enaium.jimmer.gradle.extension.Driver
-import cn.enaium.jimmer.gradle.extension.Language
 
 plugins {
     //...
@@ -44,7 +43,6 @@ dependencies {
 }
 
 jimmer {
-    language.set(Language.KOTLIN)//Language.KOTLIN,Language.JAVA, auto detect if you don't set
     generator {
         target {
             srcDir.set("src/main/kotlin")
@@ -115,75 +113,39 @@ jimmer {
 
 ## dto incremental compile
 
-```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
-
-jimmer {
-    language.set(Language.KOTLIN)//Language.JAVA
-}
-```
+Nothing
 
 ## implementation for dependencies
 
 ### spring-boot-start
 
 ```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
-
 plugins {
     id("org.springframework.boot")//require
-}
-
-jimmer {
-    language = Language.KOTLIN//Language.JAVA
 }
 ```
 
 ### sql-kotlin
 
-```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
-
-jimmer {
-    language = Language.KOTLIN
-}
-```
+Nothing
 
 ### sql
 
-```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
-
-jimmer {
-    language = Language.JAVA
-}
-```
+Nothing
 
 ## annotationProcessor/ksp for dependencies
 
 ### ksp
 
 ```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
-
 plugins {
     id("com.google.devtools.ksp")//require
-}
-
-jimmer {
-    language = Language.KOTLIN
 }
 ```
 
 ### annotationProcessor
 
-```kotlin
-import cn.enaium.jimmer.gradle.extension.Language
-
-jimmer {
-    language = Language.JAVA
-}
-```
+Nothing
 
 ## annotationProcessor/ksp arguments
 
@@ -199,7 +161,6 @@ jimmer {
 
 | extension                          | type                                                 | default                  | description                                 |
 |------------------------------------|------------------------------------------------------|--------------------------|---------------------------------------------|
-| `language`                         | `cn.enaium.jimmer.gradle.extension.Language`         | Auto detect              | Your project language.                      |
 | `version`                          | `String`                                             | `+`                      | Jimmer version.                             |
 | `keepIsPrefix`                     | `Boolean`                                            | `false`                  | Keep 'is' prefix in getter method.          |
 | `generator`                        | `cn.enaium.jimmer.gradle.extension.Generator`        |                          | Entity generator.                           |
