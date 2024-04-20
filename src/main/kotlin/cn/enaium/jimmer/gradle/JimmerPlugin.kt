@@ -22,7 +22,6 @@ import cn.enaium.jimmer.gradle.task.GenerateEntityTask
 import cn.enaium.jimmer.gradle.utility.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.compile.JavaCompile
 
 /**
  * @author Enaium
@@ -31,15 +30,13 @@ class JimmerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create("jimmer", JimmerExtension::class.java)
 
-        project.afterEvaluate { afterProject ->
-            if (!extension.language.isPresent) {
-                if (afterProject.plugins.hasJava) {
-                    extension.language.set(Language.JAVA)
-                }
+        if (!extension.language.isPresent) {
+            if (project.plugins.hasJava) {
+                extension.language.set(Language.JAVA)
+            }
 
-                if (afterProject.plugins.hasKotlin) {
-                    extension.language.set(Language.KOTLIN)
-                }
+            if (project.plugins.hasKotlin) {
+                extension.language.set(Language.KOTLIN)
             }
         }
 
@@ -195,17 +192,17 @@ class JimmerPlugin : Plugin<Project> {
                     "org.babyfish.jimmer:jimmer-sql-kotlin:${extension.version.get()}"
                 )
             }
+        }
 
-            // Add apt
-            if (project.plugins.hasJava) {
-                project.dependencies.annotationProcessor(
-                    "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
-                )
-            }
+        // Add apt
+        if (extension.language.get() == Language.JAVA) {
+            project.dependencies.annotationProcessor(
+                "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
+            )
         }
 
         // Add ksp
-        if (project.plugins.hasKsp) {
+        if (project.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
             project.dependencies.ksp(
                 "org.babyfish.jimmer:jimmer-ksp:${extension.version.get()}"
             )
