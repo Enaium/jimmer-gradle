@@ -37,6 +37,7 @@ class AptArgumentTest {
         argument[DTO_DIRS] = listOf("src/main/java")
         argument[DTO_TEST_DIRS] = listOf("src/test/java")
         argument[DTO_DEFAULT_NULLABLE_INPUT_MODIFIER] = InputDtoModifier.FIXED
+        argument[DTO_HIBERNATE_VALIDATOR_ENHANCEMENT] = true
         argument[CLIENT_CHECKED_EXCEPTION] = true
         argument[CLIENT_IGNORE_JDK_WARNING] = true
         argument[ENTRY_OBJECTS] = "Drafts"

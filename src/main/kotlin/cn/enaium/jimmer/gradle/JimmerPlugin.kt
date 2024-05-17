@@ -76,6 +76,10 @@ class JimmerPlugin : Plugin<Project> {
                         add(DTO_DEFAULT_NULLABLE_INPUT_MODIFIER, it.get().name.lowercase())
                     }
 
+                    extension.dto.hibernateValidatorEnhancement.takeIf { it.isPresent }?.let {
+                        add(DTO_HIBERNATE_VALIDATOR_ENHANCEMENT, it.get().toString())
+                    }
+
                     extension.client.checkedException.takeIf { it.isPresent }?.let {
                         add(CLIENT_CHECKED_EXCEPTION, it.get().toString())
                     }
@@ -123,6 +127,10 @@ class JimmerPlugin : Plugin<Project> {
 
                 extension.client.checkedException.takeIf { it.isPresent }?.let {
                     add(CLIENT_CHECKED_EXCEPTION, it.get().toString())
+                }
+
+                extension.immutable.isModuleRequired.takeIf { it.isPresent }?.let {
+                    add(IMMUTABLE_IS_MODULE_REQUIRED, it.get().toString())
                 }
             }
 
@@ -192,16 +200,14 @@ class JimmerPlugin : Plugin<Project> {
                     "org.babyfish.jimmer:jimmer-sql-kotlin:${extension.version.get()}"
                 )
             }
+
+            if (extension.language.get() == Language.JAVA) {
+                afterProject.dependencies.annotationProcessor(
+                    "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
+                )
+            }
         }
 
-        // Add apt
-        if (extension.language.get() == Language.JAVA) {
-            project.dependencies.annotationProcessor(
-                "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
-            )
-        }
-
-        // Add ksp
         if (project.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
             project.dependencies.ksp(
                 "org.babyfish.jimmer:jimmer-ksp:${extension.version.get()}"

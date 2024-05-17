@@ -36,6 +36,7 @@ class KspArgumentTest {
         argument[DTO_MUTABLE] = true
         argument[DTO_DEFAULT_NULLABLE_INPUT_MODIFIER] = InputDtoModifier.FIXED
         argument[CLIENT_CHECKED_EXCEPTION] = true
+        argument[IMMUTABLE_IS_MODULE_REQUIRED] = true
 
         for ((key, value) in argument) {
             when (value) {

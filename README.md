@@ -13,9 +13,12 @@ Feature:
 
 ## version
 
+Warning: The version of the extension is not support for `ksp` when the
+issue [#1789](https://github.com/google/ksp/issues/1789) doesn't fix.
+
 ```kotlin
 jimmer {
-    version.set("0.8.122")//default latest
+    version.set("0.8.131")//default latest
 }
 ```
 
@@ -159,37 +162,39 @@ jimmer {
 
 ## extension
 
-| extension                          | type                                                 | default                  | description                                 |
-|------------------------------------|------------------------------------------------------|--------------------------|---------------------------------------------|
-| `version`                          | `String`                                             | `+`                      | Jimmer version.                             |
-| `keepIsPrefix`                     | `Boolean`                                            | `false`                  | Keep 'is' prefix in getter method.          |
-| `generator`                        | `cn.enaium.jimmer.gradle.extension.Generator`        |                          | Entity generator.                           |
-| `generator.target`                 | `cn.enaium.jimmer.gradle.extension.Target`           |                          | Entity generator target.                    |
-| `generator.target.srcDir`          | `String`                                             |                          | Entity generator target src dir.            |
-| `generator.target.packageName`     | `String`                                             |                          | Entity generator target package.            |
-| `generator.jdbc`                   | `cn.enaium.jimmer.gradle.extension.Jdbc`             |                          | For database connection.                    |
-| `generator.jdbc.driver`            | `cn.enaium.jimmer.gradle.extension.Driver`           |                          | Database driver.                            |
-| `generator.jdbc.url`               | `String`                                             |                          | Database url.                               |
-| `generator.jdbc.username`          | `String`                                             |                          | Database username.                          |
-| `generator.jdbc.password`          | `String`                                             |                          | Database password.                          |
-| `generator.table`                  | `cn.enaium.jimmer.gradle.extension.Table`            |                          | Table rule.                                 |
-| `generator.table.primaryKey`       | `String`                                             | `id`                     | Table primary key name.                     |
-| `generator.table.asociation`       | `cn.enaium.jimmer.gradle.extension.Association`      | `REAL`                   | Table association rule.                     |
-| `generator.table.typeMappings`     | `Map<String, String>`                                | [default](#typemappings) | Column type mapping.                        |
-| `generator.table.comment`          | `Boolean`                                            | `false`                  | Generate table comment.                     |
-| `generator.table.idView`           | `Boolean`                                            | `false`                  | Generate id view.                           |
-| `generator.poet`                   | `cn.enaium.jimmer.gradle.extension.Poet`             |                          | Poet rule.                                  |
-| `generator.poet.indent`            | `String`                                             | Four spaces              | Poet indent.                                |
-| `client.checkedExceptions`         | `Boolean`                                            |                          |                                             |
-| `client.ignoreJdkWarning`          | `Boolean`                                            |                          | Java only.                                  |
-| `dto.dirs`                         | `List<String>`                                       |                          |                                             |
-| `dto.testDirs`                     | `List<String>`                                       |                          |                                             |
-| `dto.mutable`                      | `Boolean`                                            |                          | Kotlin only.                                |
-| `dto.defaultNullableInputModifier` | `cn.enaium.jimmer.gradle.extension.InputDtoModifier` |                          |                                             |
-| `entry`                            | `cn.enaium.jimmer.gradle.extension.Entry`            |                          | Java only.                                  |
-| `entry.objects`                    | `String`                                             |                          | Generate `objects` class name, java only.   |
-| `entry.tables`                     | `String`                                             |                          | Generate `tables` class name, java only.    |
-| `entry.tableExes`                  | `String`                                             |                          | Generate `tableExes` class name, java only. |
-| `entry.fetchers`                   | `String`                                             |                          | Generate `fetchers` class name, java only.  |
-| `source.includes`                  | `List<String>`                                       |                          | Java only.                                  |
-| `source.excludes`                  | `List<String>`                                       |                          | Java only.                                  |
+| extension                           | type                                                 | default                  | description                                 |
+|-------------------------------------|------------------------------------------------------|--------------------------|---------------------------------------------|
+| `version`                           | `String`                                             | `+`                      | Jimmer version.                             |
+| `keepIsPrefix`                      | `Boolean`                                            | `false`                  | Keep 'is' prefix in getter method.          |
+| `generator`                         | `cn.enaium.jimmer.gradle.extension.Generator`        |                          | Entity generator.                           |
+| `generator.target`                  | `cn.enaium.jimmer.gradle.extension.Target`           |                          | Entity generator target.                    |
+| `generator.target.srcDir`           | `String`                                             |                          | Entity generator target src dir.            |
+| `generator.target.packageName`      | `String`                                             |                          | Entity generator target package.            |
+| `generator.jdbc`                    | `cn.enaium.jimmer.gradle.extension.Jdbc`             |                          | For database connection.                    |
+| `generator.jdbc.driver`             | `cn.enaium.jimmer.gradle.extension.Driver`           |                          | Database driver.                            |
+| `generator.jdbc.url`                | `String`                                             |                          | Database url.                               |
+| `generator.jdbc.username`           | `String`                                             |                          | Database username.                          |
+| `generator.jdbc.password`           | `String`                                             |                          | Database password.                          |
+| `generator.table`                   | `cn.enaium.jimmer.gradle.extension.Table`            |                          | Table rule.                                 |
+| `generator.table.primaryKey`        | `String`                                             | `id`                     | Table primary key name.                     |
+| `generator.table.asociation`        | `cn.enaium.jimmer.gradle.extension.Association`      | `REAL`                   | Table association rule.                     |
+| `generator.table.typeMappings`      | `Map<String, String>`                                | [default](#typemappings) | Column type mapping.                        |
+| `generator.table.comment`           | `Boolean`                                            | `false`                  | Generate table comment.                     |
+| `generator.table.idView`            | `Boolean`                                            | `false`                  | Generate id view.                           |
+| `generator.poet`                    | `cn.enaium.jimmer.gradle.extension.Poet`             |                          | Poet rule.                                  |
+| `generator.poet.indent`             | `String`                                             | Four spaces              | Poet indent.                                |
+| `client.checkedExceptions`          | `Boolean`                                            |                          |                                             |
+| `client.ignoreJdkWarning`           | `Boolean`                                            |                          | Java only.                                  |
+| `dto.dirs`                          | `List<String>`                                       |                          |                                             |
+| `dto.testDirs`                      | `List<String>`                                       |                          |                                             |
+| `dto.mutable`                       | `Boolean`                                            |                          | Kotlin only.                                |
+| `dto.defaultNullableInputModifier`  | `cn.enaium.jimmer.gradle.extension.InputDtoModifier` |                          |                                             |
+| `dto.hibernateValidatorEnhancement` | `Boolean`                                            |                          | Java only.                                  |
+| `entry`                             | `cn.enaium.jimmer.gradle.extension.Entry`            |                          | Java only.                                  |
+| `entry.objects`                     | `String`                                             |                          | Generate `objects` class name, java only.   |
+| `entry.tables`                      | `String`                                             |                          | Generate `tables` class name, java only.    |
+| `entry.tableExes`                   | `String`                                             |                          | Generate `tableExes` class name, java only. |
+| `entry.fetchers`                    | `String`                                             |                          | Generate `fetchers` class name, java only.  |
+| `immutable.isModuleRequired`        | `Boolean`                                            |                          | Kotlin only.                                |
+| `source.includes`                   | `List<String>`                                       |                          | Java only.                                  |
+| `source.excludes`                   | `List<String>`                                       |                          | Java only.                                  |
