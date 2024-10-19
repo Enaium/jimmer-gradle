@@ -23,19 +23,19 @@ import org.gradle.api.tasks.compile.JavaCompile
 /**
  * @author Enaium
  */
-val TaskContainer.hasKsp: Boolean
+internal val TaskContainer.hasKsp: Boolean
     get() = findByName(KSP_TASK_NAME) != null
 
-val TaskContainer.hasCompileJava: Boolean
+internal val TaskContainer.hasCompileJava: Boolean
     get() = findByName("compileJava") != null
 
-fun TaskContainer.compileJava(action: (JavaCompile) -> Unit) {
+internal fun TaskContainer.compileJava(action: (JavaCompile) -> Unit) {
     withType(JavaCompile::class.java) {
         action(it)
     }
 }
 
-fun TaskContainer.kspKotlin(action: (Task) -> Unit) {
+internal fun TaskContainer.kspKotlin(action: (Task) -> Unit) {
     getByName(KSP_TASK_NAME) {
         action(it)
     }

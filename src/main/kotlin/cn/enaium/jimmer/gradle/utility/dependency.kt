@@ -16,20 +16,35 @@
 
 package cn.enaium.jimmer.gradle.utility
 
+import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.internal.tasks.JvmConstants
 
 /**
  * @author Enaium
  */
-fun DependencyHandler.implementation(dependency: String) {
+internal fun DependencyHandler.implementation(dependency: String) {
     add(JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME, dependency)
 }
 
-fun DependencyHandler.annotationProcessor(dependency: String) {
+internal fun DependencyHandler.annotationProcessor(dependency: String) {
     add(JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME, dependency)
 }
 
-fun DependencyHandler.ksp(dependency: String) {
+internal fun DependencyHandler.ksp(dependency: String) {
     add("ksp", dependency)
+}
+
+internal fun Project.hasDependency(
+    artifact: String,
+    name: String = JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME
+): Boolean {
+    var has = false
+    configurations.getByName(name).dependencies.all {
+        if (it.name == artifact) {
+            has = true
+            return@all
+        }
+    }
+    return has
 }

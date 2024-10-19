@@ -22,6 +22,7 @@ import cn.enaium.jimmer.gradle.task.GenerateEntityTask
 import cn.enaium.jimmer.gradle.utility.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.internal.tasks.JvmConstants
 
 /**
  * @author Enaium
@@ -106,7 +107,7 @@ class JimmerPlugin : Plugin<Project> {
                 }
             } else if (afterProject.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
                 fun add(key: String, value: String) {
-                    afterProject.extensions.ksp.arg(key, value)
+                    kspArg(afterProject.extensions.getByName("ksp"), key, value)
                 }
 
                 extension.dto.dirs.takeIf { it.isPresent && it.get().isNotEmpty() }?.let {
@@ -135,6 +136,7 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             if (afterProject.tasks.hasCompileJava && extension.language.get() == Language.JAVA) {
+                afterProject.tasks.getByName(PRE_TASK_NAME).dependsOn("compileJava")
                 afterProject.tasks.compileJava { compile ->
                     compile.options.compilerArgs.firstOrNull {
                         it.startsWith("-A$DTO_DIRS=")
@@ -165,8 +167,10 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             if (afterProject.tasks.hasKsp && extension.language.get() == Language.KOTLIN) {
+                afterProject.tasks.getByName(PRE_TASK_NAME).dependsOn(KSP_TASK_NAME)
+
                 afterProject.tasks.kspKotlin { kspKotlin ->
-                    afterProject.extensions.ksp.arguments[DTO_DIRS]?.let { dirs ->
+                    kspArguments(afterProject.extensions.getByName("ksp"))[DTO_DIRS]?.let { dirs ->
                         dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
                             when {
                                 it == "" || it == "/" -> null
@@ -187,31 +191,50 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             // Add spring-boot-starter,sql,sql-kotlin
-            if (afterProject.plugins.hasSpringBoot) {
+            if (afterProject.plugins.hasSpringBoot && !afterProject.hasDependency(JIMMER_SPRINGBOOT_NAME)) {
                 afterProject.dependencies.implementation(
-                    "org.babyfish.jimmer:jimmer-spring-boot-starter:${extension.version.get()}"
+                    "$JIMMER_GROUP:$JIMMER_SPRINGBOOT_NAME:${extension.version.get()}"
                 )
-            } else if (extension.language.get() == Language.JAVA) {
+            } else if (extension.language.get() == Language.JAVA && !afterProject.hasDependency(JIMMER_SQL_NAME)) {
                 afterProject.dependencies.implementation(
-                    "org.babyfish.jimmer:jimmer-sql:${extension.version.get()}"
+                    "$JIMMER_GROUP:$JIMMER_SQL_NAME:${extension.version.get()}"
                 )
-            } else if (extension.language.get() == Language.KOTLIN) {
+            } else if (extension.language.get() == Language.KOTLIN
+                && !afterProject.hasDependency(JIMMER_SQL_KOTLIN_NAME)
+            ) {
                 afterProject.dependencies.implementation(
-                    "org.babyfish.jimmer:jimmer-sql-kotlin:${extension.version.get()}"
+                    "$JIMMER_GROUP:$JIMMER_SQL_KOTLIN_NAME:${extension.version.get()}"
                 )
             }
 
-            if (extension.language.get() == Language.JAVA) {
+            if (extension.language.get() == Language.JAVA
+                && !afterProject.hasDependency(JIMMER_APT_NAME, JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME)
+            ) {
                 afterProject.dependencies.annotationProcessor(
-                    "org.babyfish.jimmer:jimmer-apt:${extension.version.get()}"
+                    "$JIMMER_GROUP:$JIMMER_APT_NAME:${extension.version.get()}"
                 )
             }
         }
 
-        if (project.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
+        if (project.plugins.hasKsp && extension.language.get() == Language.KOTLIN
+            && hasClass("com.google.devtools.ksp.gradle.KspExtension")
+        ) {
             project.dependencies.ksp(
-                "org.babyfish.jimmer:jimmer-ksp:${extension.version.get()}"
+                "$JIMMER_GROUP:$JIMMER_KSP_NAME:${extension.version.get()}"
             )
         }
+    }
+
+    private fun kspArg(any: Any, key: String, value: String) {
+        any.javaClass.methods.firstOrNull {
+            it.name == "arg" && it.parameterTypes.size == 2
+        }?.invoke(any, key, value)
+    }
+
+    private fun kspArguments(any: Any): MutableMap<String, String> {
+        @Suppress("UNCHECKED_CAST")
+        return any.javaClass.methods.firstOrNull {
+            it.name == "getArguments"
+        }?.invoke(any) as MutableMap<String, String>
     }
 }

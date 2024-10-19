@@ -31,7 +31,7 @@ open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
     val source: Source = objects.newInstance(Source::class.java)
     val immutable: Immutable = objects.newInstance(Immutable::class.java)
     val language: Property<Language> = objects.property(Language::class.java)
-    val version: Property<String> = objects.property(String::class.java).convention("+")
+    val version: Property<String> = objects.property(String::class.java).convention("latest.release")
     val keepIsPrefix: Property<Boolean> = objects.property(Boolean::class.java)
 
     fun generator(action: Generator.() -> Unit) {

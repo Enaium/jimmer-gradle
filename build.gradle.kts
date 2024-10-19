@@ -6,15 +6,13 @@ plugins {
 }
 
 group = "cn.enaium"
-version = "0.0.12"
+version = "0.0.13"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly(libs.ksp)
-
     implementation(libs.kotlinpoet)
     implementation(libs.javapoet)
     implementation(libs.jetbrainsAnnotations)
@@ -51,6 +49,13 @@ gradlePlugin {
             id = "cn.enaium.jimmer.gradle"
             implementationClass = "cn.enaium.jimmer.gradle.JimmerPlugin"
             displayName = "jimmer-gradle"
+            description = "A gradle plugin for jimmer"
+            tags.set(listOf("orm", "jimmer", "generator"))
+        }
+        create("setting") {
+            id = "cn.enaium.jimmer.gradle.setting"
+            implementationClass = "cn.enaium.jimmer.gradle.SettingPlugin"
+            displayName = "setting"
             description = "A gradle plugin for jimmer"
             tags.set(listOf("orm", "jimmer", "generator"))
         }

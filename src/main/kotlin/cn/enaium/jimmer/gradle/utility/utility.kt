@@ -16,11 +16,14 @@
 
 package cn.enaium.jimmer.gradle.utility
 
-import org.gradle.api.initialization.dsl.VersionCatalogBuilder
-
 /**
  * @author Enaium
  */
-internal fun VersionCatalogBuilder.lib(alias: String, artifact: String): VersionCatalogBuilder.LibraryAliasBuilder {
-    return library(alias, JIMMER_GROUP, "jimmer-$artifact")
+internal fun hasClass(className: String): Boolean {
+    return try {
+        Class.forName(className)
+        true
+    } catch (e: ClassNotFoundException) {
+        false
+    }
 }

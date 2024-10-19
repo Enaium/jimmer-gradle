@@ -3,26 +3,93 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square&logo=kotlin)
 ![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square&logo=gradle)
 
-Feature:
+## Feature
 
 - Generate code for database table, column and association.
 - Incremental compile for dto language (apt/ksp).
-- implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
-- annotationProcessor/ksp for dependencies.
+- Add implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
+- Add annotationProcessor/ksp for dependencies.
 - Easy to add arguments for annotationProcessor/ksp.
+- Can use jimmer's catalog in the project.
+- Let jimmer generate code when opening the project for the first time.
 
-## version
+## Usage
 
-Warning: The version of the extension is not support for `ksp` when the
-issue [#1789](https://github.com/google/ksp/issues/1789) doesn't fix.
+Warning: You cannot use the method 1 and method 2 at the same time.
+
+### Gradle Project Plugin(Method 1)
+
+In the `build.gradle.kts` file, you can use the following code to apply the plugin.
 
 ```kotlin
-jimmer {
-    version.set("0.8.131")//default latest
+plugins {
+    id("cn.enaium.jimmer.gradle") version "latest.release"
 }
 ```
 
-## generate entity
+If you also used kotlin, you need to declare the ksp plugin before the jimmer plugin.
+
+```kotlin
+plugins {
+    kotlin("jvm") version "2.0.21"
+    id("com.google.devtools.ksp") version "2.0.21+"
+    id("cn.enaium.jimmer.gradle") version "latest.release"
+}
+```
+
+### Gradle Settings Plugin(Method 2)
+
+In the `settings.gradle.kts` file, you can use the following code to apply the plugin.
+
+```kotlin
+plugins {
+    id("cn.enaium.jimmer.gradle.setting") version "latest.release"
+}
+```
+
+If you want to modify the extension of the gradle project plugin, then you can use the gradle project plugin.
+
+```kotlin
+plugins {
+    alias(jimmer_catalog.plugins.jimmer)
+}
+```
+
+If you also used kotlin, you need to declare the ksp plugin before the jimmer plugin.
+
+```kotlin
+plugins {
+    kotlin("jvm") version "2.0.21"
+    alias(jimmer_catalog.plugins.ksp) version "2.0.21+"
+    alias(jimmer_catalog.plugins.jimmer)
+}
+```
+
+then you need to add the ksp dependency in the `build.gradle.kts` file.
+
+```kotlin
+dependencies {
+    ksp(jimmer_catalog.ksp)
+}
+```
+
+## Jimmer's Version(Both Gradle Project Plugin and Gradle Settings Plugin)
+
+Warning: The version of the extension is not supported for `ksp` when
+issue [#1789](https://github.com/google/ksp/issues/1789) isn't fixed, but you can use the latest version or use the
+gradle setting
+plugin.
+
+In the `build.gradle.kts` file if you use the gradle project plugin, or in the `settings.gradle.kts` file if you use the
+gradle settings plugin, you can use the following code to set the version of jimmer.
+
+```kotlin
+jimmer {
+    version.set("latest.release")//default latest
+}
+```
+
+## Generate Entity(Only Gradle Project Plugin)
 
 ![Static Badge](https://img.shields.io/badge/-Kotlin-gray?style=flat-square&logo=kotlin&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/-Java-gray?style=flat-square&logo=openjdk&logoColor=white)
@@ -72,7 +139,7 @@ jimmer {
 }
 ```
 
-### association
+### Association(Only Gradle Project Plugin)
 
 You must add the suffix '_id'(`primaryKey.set("id")`) to the column name if the column is a fake foreign key, otherwise
 the column cannot be recognized as a foreign key.
@@ -94,7 +161,7 @@ jimmer {
 }
 ```
 
-### typeMappings
+### typeMappings(Only Gradle Project Plugin)
 
 [default](src/main/kotlin/cn/enaium/jimmer/gradle/utility/mapping.kt)
 
@@ -114,9 +181,9 @@ jimmer {
 }
 ```
 
-## dto incremental compile
+## Dto Incremental Compile
 
-Nothing
+Open the dto file and press `Ctrl + F9` to compile the dto file.
 
 ## implementation for dependencies
 
@@ -142,7 +209,7 @@ Nothing
 
 ```kotlin
 plugins {
-    id("com.google.devtools.ksp")//require
+    id("com.google.devtools.ksp")//require and must declare before jimmer gradle plugin
 }
 ```
 
@@ -160,11 +227,11 @@ jimmer {
 }
 ```
 
-## extension
+## Gradle Project Plugin Extension
 
 | extension                           | type                                                 | default                  | description                                 |
 |-------------------------------------|------------------------------------------------------|--------------------------|---------------------------------------------|
-| `version`                           | `String`                                             | `+`                      | Jimmer version.                             |
+| `version`                           | `String`                                             | `latest.release`         | Jimmer version.                             |
 | `keepIsPrefix`                      | `Boolean`                                            | `false`                  | Keep 'is' prefix in getter method.          |
 | `generator`                         | `cn.enaium.jimmer.gradle.extension.Generator`        |                          | Entity generator.                           |
 | `generator.target`                  | `cn.enaium.jimmer.gradle.extension.Target`           |                          | Entity generator target.                    |
@@ -198,3 +265,9 @@ jimmer {
 | `immutable.isModuleRequired`        | `Boolean`                                            |                          | Kotlin only.                                |
 | `source.includes`                   | `List<String>`                                       |                          | Java only.                                  |
 | `source.excludes`                   | `List<String>`                                       |                          | Java only.                                  |
+
+## Gradle Settings Plugin Extension
+
+| extension | type     | default          | description     |
+|-----------|----------|------------------|-----------------|
+| `version` | `String` | `latest.release` | Jimmer version. |

@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package cn.enaium.jimmer.gradle.utility
+package cn.enaium.jimmer.gradle.extension
 
-import org.gradle.api.initialization.dsl.VersionCatalogBuilder
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import javax.inject.Inject
 
 /**
  * @author Enaium
  */
-internal fun VersionCatalogBuilder.lib(alias: String, artifact: String): VersionCatalogBuilder.LibraryAliasBuilder {
-    return library(alias, JIMMER_GROUP, "jimmer-$artifact")
+open class SettingExtension @Inject constructor(objects: ObjectFactory) {
+    val version: Property<String> = objects.property(String::class.java).convention("latest.release")
 }

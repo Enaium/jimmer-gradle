@@ -21,14 +21,14 @@ import org.gradle.api.plugins.PluginContainer
 /**
  * @author Enaium
  */
-val PluginContainer.hasJava: Boolean
+internal val PluginContainer.hasJava: Boolean
     get() = hasPlugin("java")
 
-val PluginContainer.hasKotlin: Boolean
+internal val PluginContainer.hasKotlin: Boolean
     get() = hasPlugin("org.jetbrains.kotlin.jvm")
 
-val PluginContainer.hasKsp: Boolean
+internal val PluginContainer.hasKsp: Boolean
     get() = hasPlugin(KSP_PLUGIN_ID)
 
-val PluginContainer.hasSpringBoot: Boolean
+internal val PluginContainer.hasSpringBoot: Boolean
     get() = hasPlugin(SPRINGBOOT_PLUGIN_ID)

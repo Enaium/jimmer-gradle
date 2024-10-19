@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArraySet
 /**
  * @author Enaium
  */
-enum class ColumnLabel {
+internal enum class ColumnLabel {
     COLUMN_NAME, TABLE_NAME, TYPE_NAME, REMARKS, COLUMN_DEF, NULLABLE, PK_NAME, FKCOLUMN_NAME, PKTABLE_NAME, PKCOLUMN_NAME, FK_NAME, INDEX_NAME
 }
 
@@ -39,7 +39,7 @@ private fun ResultSet.toColumn(tableName: String): Column {
     )
 }
 
-fun DatabaseMetaData.getTables(): Set<Table> {
+internal fun DatabaseMetaData.getTables(): Set<Table> {
     return getTables(null, null, null, arrayOf("TABLE")).use { tableResult ->
         val tables = mutableSetOf<Table>()
         while (tableResult.next()) {
@@ -54,7 +54,7 @@ fun DatabaseMetaData.getTables(): Set<Table> {
     }
 }
 
-fun DatabaseMetaData.getColumns(tableName: String): Set<Column> {
+internal fun DatabaseMetaData.getColumns(tableName: String): Set<Column> {
     return getColumns(null, null, tableName, null).use { column ->
         val columns = mutableSetOf<Column>()
         while (column.next()) {
@@ -64,7 +64,7 @@ fun DatabaseMetaData.getColumns(tableName: String): Set<Column> {
     }
 }
 
-fun DatabaseMetaData.getPrimaryKeys(tableName: String): Set<PrimaryKey> {
+internal fun DatabaseMetaData.getPrimaryKeys(tableName: String): Set<PrimaryKey> {
     return getPrimaryKeys(null, null, tableName).use { primaryKey ->
         val primaryKeys = mutableSetOf<PrimaryKey>()
         while (primaryKey.next()) {
@@ -76,7 +76,7 @@ fun DatabaseMetaData.getPrimaryKeys(tableName: String): Set<PrimaryKey> {
     }
 }
 
-fun DatabaseMetaData.getForeignKeys(tableName: String): MutableSet<ForeignKey> {
+internal fun DatabaseMetaData.getForeignKeys(tableName: String): MutableSet<ForeignKey> {
     return getImportedKeys(null, null, tableName).use { foreignKey ->
         val foreignKeys = mutableSetOf<ForeignKey>()
         while (foreignKey.next()) {
@@ -91,7 +91,7 @@ fun DatabaseMetaData.getForeignKeys(tableName: String): MutableSet<ForeignKey> {
     }
 }
 
-fun DatabaseMetaData.getUniqueKeys(tableName: String): Set<UniqueKey> {
+internal fun DatabaseMetaData.getUniqueKeys(tableName: String): Set<UniqueKey> {
     val uniqueKey2Columns = mutableMapOf<String, CopyOnWriteArraySet<String>>()
     getIndexInfo(null, null, tableName, true, false).use { uniqueKey ->
         while (uniqueKey.next()) {

@@ -1,7 +1,6 @@
 [versions]
-kotlin = "1.9.23"
+kotlin = "2.0.21"
 publishing = "1.2.1"
-ksp = "1.9.23-1.0.20"
 kotlinpoet = "1.16.0"
 javapoet = "1.13.0"
 testcontainers = "1.19.7"
@@ -12,7 +11,6 @@ jimmer = "0.8.124"
 jetbrainsAnnotations = "24.1.0"
 
 [libraries]
-ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
