@@ -29,7 +29,7 @@ class SettingPlugin : Plugin<Settings> {
         val extension = target.extensions.create("jimmer", SettingExtension::class.java)
 
         target.dependencyResolutionManagement.versionCatalogs.apply {
-            register("jimmer_catalog") {
+            register("jimmers") {
                 it.plugin("jimmer", "cn.enaium.jimmer.gradle").version {
                     // Nothing
                 }

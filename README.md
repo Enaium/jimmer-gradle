@@ -13,7 +13,7 @@
 - Can use jimmer's catalog in the project.
 - Let jimmer generate code when opening the project for the first time.
 
-## Usage
+## Usage(Recommended Method 2)
 
 Warning: You cannot use the method 1 and method 2 at the same time.
 
@@ -51,7 +51,7 @@ If you want to modify the extension of the gradle project plugin, then you can u
 
 ```kotlin
 plugins {
-    alias(jimmer_catalog.plugins.jimmer)
+    alias(jimmers.plugins.jimmer)
 }
 ```
 
@@ -60,8 +60,8 @@ If you also used kotlin, you need to declare the ksp plugin before the jimmer pl
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.21"
-    alias(jimmer_catalog.plugins.ksp) version "2.0.21+"
-    alias(jimmer_catalog.plugins.jimmer)
+    alias(jimmers.plugins.ksp) version "2.0.21+"
+    alias(jimmers.plugins.jimmer)
 }
 ```
 
@@ -69,7 +69,7 @@ then you need to add the ksp dependency in the `build.gradle.kts` file.
 
 ```kotlin
 dependencies {
-    ksp(jimmer_catalog.ksp)
+    ksp(jimmers.ksp)
 }
 ```
 
@@ -195,29 +195,71 @@ plugins {
 }
 ```
 
+It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+
+```kotlin
+dependencies {
+    implementation(jimmers.springBootStart)
+}
+```
+
 ### sql-kotlin
 
-Nothing
+It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+
+```kotlin
+dependencies {
+    implementation(jimmers.sqlKotlin)
+}
+```
 
 ### sql
 
-Nothing
+It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+
+```kotlin
+dependencies {
+    implementation(jimmers.sql)
+}
+```
 
 ## annotationProcessor/ksp for dependencies
 
 ### ksp
 
+It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+
 ```kotlin
 plugins {
-    id("com.google.devtools.ksp")//require and must declare before jimmer gradle plugin
+    kotlin("jvm") version "2.0.21"
+    id("com.google.devtools.ksp") version "2.0.21+" //require and must declare before jimmer gradle plugin
+}
+```
+
+```kotlin
+plugins {
+    kotlin("jvm") version "2.0.21"
+    alias(jimmers.plugins.ksp) version "2.0.21+"
+}
+```
+
+```kotlin
+dependencies {
+    ksp(jimmers.ksp)
 }
 ```
 
 ### annotationProcessor
 
-Nothing
+It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
 
-## annotationProcessor/ksp arguments
+```kotlin
+dependencies {
+    annotationProcessor(jimmers.apt)
+}
+```
+
+## annotationProcessor/ksp arguments(Only Gradle Project Plugin)
 
 ```kotlin
 jimmer {

@@ -1,9 +1,10 @@
 import cn.enaium.jimmer.gradle.extension.InputDtoModifier
+import org.gradle.api.JavaVersion
 
 plugins {
-    kotlin("jvm") version "1.9.23"
-    id("com.google.devtools.ksp") version "1.9.23-1.0.20"
-    id("cn.enaium.jimmer.gradle") version System.getProperty("jimmer-gradle")
+    kotlin("jvm") version "2.0.21"
+    alias(jimmers.plugins.ksp) version "2.0.21+"
+    alias(jimmers.plugins.jimmer)
 }
 
 group = "cn.enaium"

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "cn.enaium"
-version = "0.0.13"
+version = "0.0.14"
 
 repositories {
     mavenCentral()
@@ -30,15 +30,6 @@ tasks.test {
     useJUnitPlatform()
     jvmArgs("-D${rootProject.name}=${project.version}")
     dependsOn(tasks.publishToMavenLocal)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-kotlin {
-    jvmToolchain(8)
 }
 
 gradlePlugin {
