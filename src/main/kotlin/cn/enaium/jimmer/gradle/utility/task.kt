@@ -26,6 +26,9 @@ import org.gradle.api.tasks.compile.JavaCompile
 internal val TaskContainer.hasKsp: Boolean
     get() = findByName(KSP_TASK_NAME) != null
 
+internal val TaskContainer.hasPre: Boolean
+    get() = findByName(PRE_TASK_NAME) != null
+
 internal val TaskContainer.hasCompileJava: Boolean
     get() = findByName("compileJava") != null
 

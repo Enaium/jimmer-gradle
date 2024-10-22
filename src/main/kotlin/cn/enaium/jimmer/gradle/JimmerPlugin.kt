@@ -136,7 +136,11 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             if (afterProject.tasks.hasCompileJava && extension.language.get() == Language.JAVA) {
-                afterProject.tasks.getByName(PRE_TASK_NAME).dependsOn("compileJava")
+                afterProject.rootProject.tasks.also {
+                    if (it.hasPre) {
+                        it.getByName(PRE_TASK_NAME).dependsOn(afterProject.tasks.getByName("compileJava"))
+                    }
+                }
                 afterProject.tasks.compileJava { compile ->
                     compile.options.compilerArgs.firstOrNull {
                         it.startsWith("-A$DTO_DIRS=")
@@ -167,7 +171,11 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             if (afterProject.tasks.hasKsp && extension.language.get() == Language.KOTLIN) {
-                afterProject.tasks.getByName(PRE_TASK_NAME).dependsOn(KSP_TASK_NAME)
+                afterProject.rootProject.tasks.also {
+                    if (it.hasPre) {
+                        it.getByName(PRE_TASK_NAME).dependsOn(afterProject.tasks.getByName(KSP_TASK_NAME))
+                    }
+                }
 
                 afterProject.tasks.kspKotlin { kspKotlin ->
                     kspArguments(afterProject.extensions.getByName("ksp"))[DTO_DIRS]?.let { dirs ->
