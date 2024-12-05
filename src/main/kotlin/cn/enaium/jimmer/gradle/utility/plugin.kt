@@ -25,7 +25,7 @@ internal val PluginContainer.hasJava: Boolean
     get() = hasPlugin("java")
 
 internal val PluginContainer.hasKotlin: Boolean
-    get() = hasPlugin("org.jetbrains.kotlin.jvm")
+    get() = hasPlugin("org.jetbrains.kotlin.jvm") || hasPlugin("org.jetbrains.kotlin.multiplatform") || hasPlugin("org.jetbrains.kotlin.android")
 
 internal val PluginContainer.hasKsp: Boolean
     get() = hasPlugin(KSP_PLUGIN_ID)
