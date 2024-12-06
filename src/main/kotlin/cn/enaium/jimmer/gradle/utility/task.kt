@@ -26,11 +26,20 @@ import org.gradle.api.tasks.compile.JavaCompile
 internal val TaskContainer.hasKsp: Boolean
     get() = findByName(KSP_TASK_NAME) != null
 
+internal val TaskContainer.hasDebugKsp: Boolean
+    get() = findByName(KSP_DEBUG_TASK_NAME) != null
+
 internal val TaskContainer.hasPre: Boolean
     get() = findByName(PRE_TASK_NAME) != null
 
 internal val TaskContainer.hasCompileJava: Boolean
     get() = findByName("compileJava") != null
+
+internal val TaskContainer.hasCompileKotlin: Boolean
+    get() = findByName("compileKotlin") != null
+
+internal val TaskContainer.hasCompileDebugKotlin: Boolean
+    get() = findByName("compileDebugKotlin") != null
 
 internal fun TaskContainer.compileJava(action: (JavaCompile) -> Unit) {
     withType(JavaCompile::class.java) {
@@ -40,6 +49,24 @@ internal fun TaskContainer.compileJava(action: (JavaCompile) -> Unit) {
 
 internal fun TaskContainer.kspKotlin(action: (Task) -> Unit) {
     getByName(KSP_TASK_NAME) {
+        action(it)
+    }
+}
+
+internal fun TaskContainer.kspDebugKotlin(action: (Task) -> Unit) {
+    getByName(KSP_DEBUG_TASK_NAME) {
+        action(it)
+    }
+}
+
+internal fun TaskContainer.compileKotlin(action: (Task) -> Unit) {
+    getByName("compileKotlin") {
+        action(it)
+    }
+}
+
+internal fun TaskContainer.compileDebugKotlin(action: (Task) -> Unit) {
+    getByName("compileDebugKotlin") {
         action(it)
     }
 }

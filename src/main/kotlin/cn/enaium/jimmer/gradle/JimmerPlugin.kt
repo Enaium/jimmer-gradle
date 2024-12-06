@@ -22,6 +22,7 @@ import cn.enaium.jimmer.gradle.task.GenerateEntityTask
 import cn.enaium.jimmer.gradle.utility.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.internal.tasks.JvmConstants
 
 /**
@@ -170,31 +171,55 @@ class JimmerPlugin : Plugin<Project> {
                 }
             }
 
-            if (afterProject.tasks.hasKsp && extension.language.get() == Language.KOTLIN) {
+            if (afterProject.tasks.hasCompileKotlin && afterProject.tasks.hasKsp && extension.language.get() == Language.KOTLIN) {
                 afterProject.rootProject.tasks.also {
                     if (it.hasPre) {
                         it.getByName(PRE_TASK_NAME).dependsOn(afterProject.tasks.getByName(KSP_TASK_NAME))
                     }
                 }
+            }
 
-                afterProject.tasks.kspKotlin { kspKotlin ->
-                    kspArguments(afterProject.extensions.getByName("ksp"))[DTO_DIRS]?.let { dirs ->
-                        dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
-                            when {
-                                it == "" || it == "/" -> null
-                                it.startsWith("/") -> it.substring(1)
-                                it.endsWith("/") -> it.substring(0, it.length - 1)
-                                else -> it.takeIf { it.isNotEmpty() }
-                            }
-                        }.toSet().forEach {
-                            kspKotlin.inputs.dir(it)
+            fun addInputs(task: Task) {
+                kspArguments(afterProject.extensions.getByName("ksp"))[DTO_DIRS]?.let { dirs ->
+                    dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
+                        when {
+                            it == "" || it == "/" -> null
+                            it.startsWith("/") -> it.substring(1)
+                            it.endsWith("/") -> it.substring(0, it.length - 1)
+                            else -> it.takeIf { it.isNotEmpty() }
                         }
-                    } ?: let {
-                        val dir = afterProject.layout.projectDirectory.dir("src").file("main/dto/")
-                        if (dir.asFile.exists()) {
-                            kspKotlin.inputs.dir(dir)
-                        }
+                    }.toSet().forEach {
+                        task.inputs.dir(it)
                     }
+                } ?: let {
+                    val dir = afterProject.layout.projectDirectory.dir("src").file("main/dto/")
+                    if (dir.asFile.exists()) {
+                        task.inputs.dir(dir)
+                    }
+                }
+            }
+
+            if (afterProject.tasks.hasCompileKotlin) {
+                afterProject.tasks.compileKotlin { compileKotlin ->
+                    addInputs(compileKotlin)
+                }
+            }
+
+            if (afterProject.tasks.hasCompileDebugKotlin) {
+                afterProject.tasks.compileDebugKotlin { compileDebugKotlin ->
+                    addInputs(compileDebugKotlin)
+                }
+            }
+
+            if (afterProject.tasks.hasKsp) {
+                afterProject.tasks.kspKotlin { kspKotlin ->
+                    addInputs(kspKotlin)
+                }
+            }
+
+            if (afterProject.tasks.hasDebugKsp) {
+                afterProject.tasks.kspDebugKotlin { kspDebugKotlin ->
+                    addInputs(kspDebugKotlin)
                 }
             }
 
