@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "cn.enaium"
-version = "0.0.18"
+version = "${properties["version"]}"
 
 repositories {
     mavenCentral()
@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.javapoet)
     implementation(libs.jetbrainsAnnotations)
     implementation(libs.jimmer)
+    implementation(libs.jackson)
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.mariadb)
     testImplementation(libs.testcontainers.mysql)

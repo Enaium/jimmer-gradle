@@ -7,14 +7,16 @@ testcontainers = "1.19.7"
 postgresql = "42.7.3"
 mariadb = "3.3.3"
 mysql = "8.3.0"
-jimmer = "0.9.25"
+jimmer = "0.9.35"
 jetbrainsAnnotations = "24.1.0"
+jackson = "2.18.2"
 
 [libraries]
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
 jimmer = { module = "org.babyfish.jimmer:jimmer-core", version.ref = "jimmer" }
+jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
 testcontainers-mariadb = { module = "org.testcontainers:mariadb", version.ref = "testcontainers" }
 testcontainers-mysql = { module = "org.testcontainers:mysql", version.ref = "testcontainers" }

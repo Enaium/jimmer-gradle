@@ -36,6 +36,12 @@ import java.util.logging.Logger
  * @author Enaium
  */
 open class GenerateEntityTask : DefaultTask() {
+
+    init {
+        group = "jimmer"
+        description = "Generate entity"
+    }
+
     @TaskAction
     fun generateEntity() {
         val extension = project.extensions.getByType(JimmerExtension::class.java)
