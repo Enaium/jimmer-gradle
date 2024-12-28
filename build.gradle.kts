@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.jetbrainsAnnotations)
     implementation(libs.jimmer)
     implementation(libs.jackson)
+    implementation(libs.jackson.kotlin)
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.mariadb)
     testImplementation(libs.testcontainers.mysql)

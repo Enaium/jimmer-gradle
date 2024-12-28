@@ -18,6 +18,7 @@ package cn.enaium.jimmer.gradle
 
 import cn.enaium.jimmer.gradle.extension.JimmerExtension
 import cn.enaium.jimmer.gradle.extension.Language
+import cn.enaium.jimmer.gradle.task.AllProjectDependencies
 import cn.enaium.jimmer.gradle.task.GenerateEntityTask
 import cn.enaium.jimmer.gradle.task.GenerateLspDependenciesTask
 import cn.enaium.jimmer.gradle.utility.*
@@ -47,6 +48,8 @@ class JimmerPlugin : Plugin<Project> {
             val generateEntity = afterProject.tasks.register("generateEntity", GenerateEntityTask::class.java)
             val generateLspDependencies =
                 afterProject.tasks.register("generateLspDependencies", GenerateLspDependenciesTask::class.java)
+            val allProjectDependencies =
+                afterProject.tasks.register("allProjectDependencies", AllProjectDependencies::class.java)
 
             if (extension.language.get() == Language.JAVA) {
                 afterProject.tasks.compileJava { compile ->
@@ -144,7 +147,6 @@ class JimmerPlugin : Plugin<Project> {
                     }
                 }
                 afterProject.tasks.compileJava { compile ->
-                    compile.dependsOn(generateLspDependencies)
                     compile.options.compilerArgs.firstOrNull {
                         it.startsWith("-A$DTO_DIRS=")
                     }?.let {
@@ -182,7 +184,6 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             fun addInputs(task: Task) {
-                task.dependsOn(generateLspDependencies)
                 kspArguments(afterProject.extensions.getByName("ksp"))[DTO_DIRS]?.let { dirs ->
                     dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
                         when {
