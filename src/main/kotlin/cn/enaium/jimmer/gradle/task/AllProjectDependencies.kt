@@ -35,7 +35,15 @@ open class AllProjectDependencies : DefaultTask() {
         val allProjects = rootProject.allprojects
         val map = mutableMapOf<String, List<String>>()
         allProjects.forEach { p ->
-            map[p.name] = p.configurations.named("runtimeClasspath").get().map { it.absolutePath }
+            p.configurations.named { it == "runtimeClasspath" }.takeIf { it.isNotEmpty() }
+                ?.named("runtimeClasspath")
+                ?.also {
+                    map[p.name] = it.get().map { it.absolutePath }
+                }
+            p.configurations.named { it == "debugRuntimeClasspath" }.takeIf { it.isNotEmpty() }
+                ?.named("debugRuntimeClasspath")?.also {
+                    map[p.name] = it.get().map { it.absolutePath }
+                }
         }
         rootProject.logger.lifecycle(jacksonObjectMapper().writeValueAsString(map))
     }

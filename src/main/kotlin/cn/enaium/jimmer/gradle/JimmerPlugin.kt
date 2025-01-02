@@ -184,6 +184,9 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             fun addInputs(task: Task) {
+                if (!afterProject.plugins.hasKsp) {
+                    return
+                }
                 kspArguments(afterProject.extensions.getByName("ksp"))[DTO_DIRS]?.let { dirs ->
                     dirs.split("\\s*[,:;]\\s*".toRegex()).mapNotNull {
                         when {
