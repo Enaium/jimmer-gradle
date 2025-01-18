@@ -123,6 +123,9 @@ jimmer {
             url.set("jdbc:postgresql://localhost:5432/postgres")
             username.set("postgres")
             password.set("postgres")
+//            catalog.set("postgres")
+//            schemaPattern.set("public")
+//            tableNamePattern.set("t_%")
         }
         table {
             idView.set(true)
@@ -284,6 +287,9 @@ jimmer {
 | `generator.jdbc.url`                | `String`                                             |                          | Database url.                               |
 | `generator.jdbc.username`           | `String`                                             |                          | Database username.                          |
 | `generator.jdbc.password`           | `String`                                             |                          | Database password.                          |
+| `generator.jdbc.catalog`            | `String`                                             |                          | Database catalog.                           |
+| `generator.jdbc.schemaPattern`      | `String`                                             |                          | Database schema pattern.                    |
+| `generator.jdbc.tableNamePattern`   | `String`                                             |                          | Database table name pattern.                |
 | `generator.table`                   | `cn.enaium.jimmer.gradle.extension.Table`            |                          | Table rule.                                 |
 | `generator.table.primaryKey`        | `String`                                             | `id`                     | Table primary key name.                     |
 | `generator.table.asociation`        | `cn.enaium.jimmer.gradle.extension.Association`      | `REAL`                   | Table association rule.                     |
