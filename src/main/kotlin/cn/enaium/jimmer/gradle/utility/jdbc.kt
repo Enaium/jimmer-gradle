@@ -39,8 +39,12 @@ private fun ResultSet.toColumn(tableName: String): Column {
     )
 }
 
-internal fun DatabaseMetaData.getTables(): Set<Table> {
-    return getTables(null, null, null, arrayOf("TABLE")).use { tableResult ->
+internal fun DatabaseMetaData.getTables(
+    catalog: String? = null,
+    schemaPattern: String? = null,
+    tableNamePattern: String? = null
+): Set<Table> {
+    return getTables(catalog, schemaPattern, tableNamePattern, arrayOf("TABLE")).use { tableResult ->
         val tables = mutableSetOf<Table>()
         while (tableResult.next()) {
             val tableName = tableResult.getString(ColumnLabel.TABLE_NAME.name)

@@ -17,11 +17,12 @@
 package cn.enaium.jimmer.gradle.extension
 
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 /**
  * @author Enaium
  */
 open class Immutable @Inject constructor(objects: ObjectFactory) {
-    val isModuleRequired = objects.property(Boolean::class.java)
+    val isModuleRequired: Property<Boolean> = objects.property(Boolean::class.java)
 }
