@@ -19,7 +19,7 @@ package cn.enaium.jimmer.gradle.service
 import cn.enaium.jimmer.gradle.extension.Generator
 import cn.enaium.jimmer.gradle.model.Column
 import cn.enaium.jimmer.gradle.model.Table
-import org.gradle.api.Project
+import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -28,7 +28,7 @@ import java.sql.DriverManager
  */
 interface EntityGenerateService {
 
-    fun generate(project: Project, generator: Generator)
+    fun generate(projectDir: File, generator: Generator)
 
     fun getConnection(generator: Generator): Connection {
         return DriverManager.getConnection(

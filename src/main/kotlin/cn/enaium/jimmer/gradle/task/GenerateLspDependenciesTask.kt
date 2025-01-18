@@ -22,13 +22,16 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import kotlin.io.path.*
 
 /**
  * @author Enaium
  */
 open class GenerateLspDependenciesTask : DefaultTask() {
+
+    private val configurations = project.configurations
+    private val projectDir = project.projectDir
+
     init {
         group = "jimmer"
         description = "Generate dependencies for LSP"
@@ -51,10 +54,10 @@ open class GenerateLspDependenciesTask : DefaultTask() {
         }
 
         val dependenciesJson = ObjectMapper().readTree(dependenciesFile.readText())
-        val dependencies = project.configurations.named("runtimeClasspath").get()
+        val dependencies = configurations.named("runtimeClasspath").get()
 
         (dependenciesJson as ObjectNode).set<ArrayNode>(
-            project.projectDir.absolutePath,
+            projectDir.absolutePath,
             JsonNodeFactory.instance.arrayNode().apply {
                 dependencies.forEach {
                     add(it.absolutePath)

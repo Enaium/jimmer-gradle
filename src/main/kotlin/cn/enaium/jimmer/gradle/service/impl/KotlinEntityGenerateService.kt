@@ -26,7 +26,7 @@ import cn.enaium.jimmer.gradle.utility.*
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.babyfish.jimmer.sql.*
-import org.gradle.api.Project
+import java.io.File
 import java.util.*
 
 /**
@@ -38,12 +38,16 @@ class KotlinEntityGenerateService : EntityGenerateService {
      * @param generator Generator
      * @return relative path and content
      */
-    override fun generate(project: Project, generator: Generator) {
+    override fun generate(projectDir: File, generator: Generator) {
         val idSuffix = "_${generator.table.primaryKey.get()}"
 
         val metaData = getConnection(generator).metaData
 
-        val tables = metaData.getTables()
+        val tables = metaData.getTables(
+            catalog = generator.jdbc.catalog.orNull,
+            schemaPattern = generator.jdbc.schemaPattern.orNull,
+            tableNamePattern = generator.jdbc.tableNamePattern.orNull
+        )
 
         val commonColumns = getCommonColumns(tables)
 
@@ -107,35 +111,36 @@ class KotlinEntityGenerateService : EntityGenerateService {
             TypeSpec.interfaceBuilder(ClassName(packageName, typeName)).let { type ->
                 if (commonColumns.isNotEmpty()) type.addSuperinterface(ClassName(packageName, BASE_ENTITY))
                 // Add table columns
-                type.addProperties(table.columns
-                    .filter {
-                        // Exclude common columns
-                        commonColumns.contains(it).not()
-                    }
-                    .filter {
-                        // Exclude id column
-                        if (generator.table.idView.get().not()) it.name.endsWith(
-                            idSuffix,
-                            true
-                        ).not() else true
-                    }
-                    .map { column ->
-                        val propertyBuilder = PropertySpec.builder(
-                            column.name.snakeToCamelCase(firstCharUppercase = false),
-                            getTypeName(kotlinTypeMappings, column).copy(nullable = column.nullable)
-                        )
+                type.addProperties(
+                    table.columns
+                        .filter {
+                            // Exclude common columns
+                            commonColumns.contains(it).not()
+                        }
+                        .filter {
+                            // Exclude id column
+                            if (generator.table.idView.get().not()) it.name.endsWith(
+                                idSuffix,
+                                true
+                            ).not() else true
+                        }
+                        .map { column ->
+                            val propertyBuilder = PropertySpec.builder(
+                                column.name.snakeToCamelCase(firstCharUppercase = false),
+                                getTypeName(kotlinTypeMappings, column).copy(nullable = column.nullable)
+                            )
 
-                        if (generator.table.comment.get()) {
-                            column.remark?.let {
-                                propertyBuilder.addKdoc(it)
+                            if (generator.table.comment.get()) {
+                                column.remark?.let {
+                                    propertyBuilder.addKdoc(it)
+                                }
                             }
-                        }
 
-                        if (column.name.endsWith(idSuffix, true)) {
-                            propertyBuilder.addAnnotation(IdView::class)
+                            if (column.name.endsWith(idSuffix, true)) {
+                                propertyBuilder.addAnnotation(IdView::class)
+                            }
+                            propertyBuilder.build()
                         }
-                        propertyBuilder.build()
-                    }
                 )
 
                 // Add table associations
@@ -243,7 +248,7 @@ class KotlinEntityGenerateService : EntityGenerateService {
             FileSpec.builder(packageName, tableName)
                 .indent(generator.poet.indent.get())
                 .addType(typeBuilder.build()).build()
-                .writeTo(project.projectDir.resolve(generator.target.srcDir.get()))
+                .writeTo(projectDir.resolve(generator.target.srcDir.get()))
         }
     }
 

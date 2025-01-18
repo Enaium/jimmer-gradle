@@ -25,8 +25,8 @@ import cn.enaium.jimmer.gradle.service.EntityGenerateService
 import cn.enaium.jimmer.gradle.utility.*
 import com.squareup.javapoet.*
 import org.babyfish.jimmer.sql.*
-import org.gradle.api.Project
 import org.jetbrains.annotations.Nullable
+import java.io.File
 import java.util.*
 import javax.lang.model.element.Modifier
 
@@ -39,12 +39,16 @@ class JavaEntityGenerateService : EntityGenerateService {
      * @param generator Generator
      * @return relative path and content
      */
-    override fun generate(project: Project, generator: Generator) {
+    override fun generate(projectDir: File, generator: Generator) {
         val idSuffix = "_${generator.table.primaryKey.get()}"
 
         val metaData = getConnection(generator).metaData
 
-        val tables = metaData.getTables()
+        val tables = metaData.getTables(
+            catalog = generator.jdbc.catalog.orNull,
+            schemaPattern = generator.jdbc.schemaPattern.orNull,
+            tableNamePattern = generator.jdbc.tableNamePattern.orNull
+        )
 
         val commonColumns = getCommonColumns(tables)
 
@@ -108,40 +112,41 @@ class JavaEntityGenerateService : EntityGenerateService {
             TypeSpec.interfaceBuilder(ClassName.get(packageName, typeName)).let { type ->
                 if (commonColumns.isNotEmpty()) type.addSuperinterface(ClassName.get(packageName, BASE_ENTITY))
                 // Add table columns
-                type.addMethods(table.columns
-                    .filter {
-                        // Exclude common columns
-                        commonColumns.contains(it).not()
-                    }.filter {
-                        // Exclude id column
-                        if (generator.table.idView.get().not()) it.name.endsWith(
-                            idSuffix,
-                            true
-                        ).not() else true
-                    }
-                    .map { column ->
-                        val methodBuilder =
-                            MethodSpec.methodBuilder(column.name.snakeToCamelCase(firstCharUppercase = false))
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                type.addMethods(
+                    table.columns
+                        .filter {
+                            // Exclude common columns
+                            commonColumns.contains(it).not()
+                        }.filter {
+                            // Exclude id column
+                            if (generator.table.idView.get().not()) it.name.endsWith(
+                                idSuffix,
+                                true
+                            ).not() else true
+                        }
+                        .map { column ->
+                            val methodBuilder =
+                                MethodSpec.methodBuilder(column.name.snakeToCamelCase(firstCharUppercase = false))
+                                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
 
-                        methodBuilder.returns(getTypeName(javaTypeMappings, column))
+                            methodBuilder.returns(getTypeName(javaTypeMappings, column))
 
-                        if (generator.table.comment.get()) {
-                            column.remark?.let {
-                                methodBuilder.addJavadoc(it)
+                            if (generator.table.comment.get()) {
+                                column.remark?.let {
+                                    methodBuilder.addJavadoc(it)
+                                }
                             }
-                        }
 
-                        if (column.name.endsWith(idSuffix, true)) {
-                            methodBuilder.addAnnotation(IdView::class.java)
-                        }
+                            if (column.name.endsWith(idSuffix, true)) {
+                                methodBuilder.addAnnotation(IdView::class.java)
+                            }
 
-                        if (column.nullable) {
-                            methodBuilder.addAnnotation(Nullable::class.java)
-                        }
+                            if (column.nullable) {
+                                methodBuilder.addAnnotation(Nullable::class.java)
+                            }
 
-                        methodBuilder.build()
-                    }
+                            methodBuilder.build()
+                        }
                 )
 
                 // Add table associations
@@ -271,7 +276,7 @@ class JavaEntityGenerateService : EntityGenerateService {
             JavaFile.builder(packageName, type.build())
                 .indent(generator.poet.indent.get())
                 .build()
-                .writeTo(project.file(project.projectDir.resolve(generator.target.srcDir.get())))
+                .writeTo(projectDir.resolve(generator.target.srcDir.get()))
         }
     }
 

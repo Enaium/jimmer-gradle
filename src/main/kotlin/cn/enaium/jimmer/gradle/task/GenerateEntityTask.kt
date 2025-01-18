@@ -37,6 +37,10 @@ import java.util.logging.Logger
  */
 open class GenerateEntityTask : DefaultTask() {
 
+    private val extension = project.extensions.getByType(JimmerExtension::class.java)
+    private val configurations = project.configurations
+    private val projectDir = project.projectDir
+
     init {
         group = "jimmer"
         description = "Generate entity"
@@ -44,7 +48,6 @@ open class GenerateEntityTask : DefaultTask() {
 
     @TaskAction
     fun generateEntity() {
-        val extension = project.extensions.getByType(JimmerExtension::class.java)
         val generator = extension.generator
 
         if (extension.language.get() == Language.KOTLIN) {
@@ -53,7 +56,7 @@ open class GenerateEntityTask : DefaultTask() {
             javaTypeMappings.putAll(generator.table.typeMappings.get())
         }
 
-        val classloader = project.configurations.named("runtimeClasspath").get()
+        val classloader = configurations.named("runtimeClasspath").get()
             .find { file -> file.name.startsWith(generator.jdbc.driver.get().module) }
             ?.let {
                 URLClassLoader(arrayOf(it.toURI().toURL()), this.javaClass.classLoader)
@@ -67,9 +70,9 @@ open class GenerateEntityTask : DefaultTask() {
         )
 
         if (extension.language.get() == Language.KOTLIN) {
-            KotlinEntityGenerateService().generate(project, generator)
+            KotlinEntityGenerateService().generate(projectDir, generator)
         } else if (extension.language.get() == Language.JAVA) {
-            JavaEntityGenerateService().generate(project, generator)
+            JavaEntityGenerateService().generate(projectDir, generator)
         } else {
             throw RuntimeException("Unknown language ${extension.language}")
         }

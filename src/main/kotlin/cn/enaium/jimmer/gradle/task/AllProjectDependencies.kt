@@ -24,6 +24,9 @@ import org.gradle.api.tasks.TaskAction
  * @author Enaium
  */
 open class AllProjectDependencies : DefaultTask() {
+
+    private val rootProject = project.rootProject
+
     init {
         group = "jimmer"
         description = "Get all project dependencies"
@@ -31,7 +34,7 @@ open class AllProjectDependencies : DefaultTask() {
 
     @TaskAction
     fun allProjectDependencies() {
-        val rootProject = project.rootProject
+        val rootProject = rootProject
         val allProjects = rootProject.allprojects
         val map = mutableMapOf<String, List<String>>()
         try {
