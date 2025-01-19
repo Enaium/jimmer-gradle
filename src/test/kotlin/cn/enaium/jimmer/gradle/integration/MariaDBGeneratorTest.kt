@@ -18,44 +18,36 @@ package cn.enaium.jimmer.gradle.integration
 
 import cn.enaium.jimmer.gradle.extension.Driver
 import cn.enaium.jimmer.gradle.extension.Language
-import cn.enaium.jimmer.gradle.util.ProjectTest
-import cn.enaium.jimmer.gradle.util.dbMapBuilder
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.MariaDBContainer
 import java.sql.DriverManager
-import kotlin.test.assertEquals
 
 /**
  * @author Enaium
  */
-class MariaDBGeneratorTest {
-
+class MariaDBGeneratorTest : AbstractGeneratorEntityTest() {
     private val driverDependency = "org.mariadb.jdbc:mariadb-java-client:3.3.3"
 
     @Test
     fun generateEntity() {
         val kotlin = create(language = Language.KOTLIN)
-        assertEquals(kotlin.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
+        assertGenerateTask(kotlin, Language.KOTLIN)
 
         val java = create(language = Language.JAVA)
-        assertEquals(java.task(":generateEntity")?.outcome, TaskOutcome.SUCCESS)
+        assertGenerateTask(java, Language.JAVA)
     }
 
     private fun create(language: Language): BuildResult {
-        return ProjectTest("simple").create(
-            "generateEntity",
-            dbMapBuilder(
-                mariadb.jdbcUrl,
-                mariadb.username,
-                mariadb.password,
-                Driver.MARIADB.name,
-                language.name,
-                driverDependency
-            )
+        return create(
+            mariadb.jdbcUrl,
+            mariadb.username,
+            mariadb.password,
+            Driver.MARIADB.name,
+            language.name,
+            driverDependency
         )
     }
 

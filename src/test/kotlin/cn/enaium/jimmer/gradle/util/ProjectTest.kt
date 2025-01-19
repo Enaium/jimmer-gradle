@@ -12,7 +12,7 @@ import java.nio.file.Files
  */
 class ProjectTest(private val name: String) {
 
-    private val testProjectDir: File =
+    val testProjectDir: File =
         Files.createTempDirectory("jimmer-gradle-${name}-${System.currentTimeMillis()}").toFile()
 
     private fun copyInputFiles(stringMap: Map<String, String>) {

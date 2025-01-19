@@ -19,17 +19,14 @@ package cn.enaium.jimmer.gradle.integration
 import cn.enaium.jimmer.gradle.extension.Driver
 import cn.enaium.jimmer.gradle.extension.Language
 import org.gradle.testkit.runner.BuildResult
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.PostgreSQLContainer
-import java.sql.DriverManager
 
 /**
  * @author Enaium
  */
-class PostgresSQLGeneratorTest : AbstractGeneratorEntityTest() {
-    private val driverDependency = "org.postgresql:postgresql:42.6.0"
+class H2GeneratorTest : AbstractGeneratorEntityTest() {
+
+    private val driverDependency = "com.h2database:h2:1.4.200"
 
     @Test
     fun generateEntity() {
@@ -42,36 +39,12 @@ class PostgresSQLGeneratorTest : AbstractGeneratorEntityTest() {
 
     private fun create(language: Language): BuildResult {
         return create(
-            postgres.jdbcUrl,
-            postgres.username,
-            postgres.password,
-            Driver.POSTGRESQL.name,
+            "jdbc:h2:mem:test;MODE=MySQL;DATABASE_TO_LOWER=true;INIT=RUNSCRIPT FROM 'src/test/resources/mariadb.sql'",
+            "",
+            "",
+            Driver.H2.name,
             language.name,
             driverDependency
         )
-    }
-
-    companion object {
-        private val postgres: PostgreSQLContainer<*> = PostgreSQLContainer("postgres:latest")
-
-
-        @BeforeAll
-        @JvmStatic
-        fun beforeAll() {
-            postgres.start()
-
-            Class.forName(postgres.driverClassName)
-            DriverManager.getConnection(
-                postgres.jdbcUrl,
-                postgres.username,
-                postgres.password
-            ).createStatement().execute(object {}::class.java.getResource("/postgres.sql")!!.readText())
-        }
-
-        @AfterAll
-        @JvmStatic
-        fun afterAll() {
-            postgres.stop()
-        }
     }
 }
