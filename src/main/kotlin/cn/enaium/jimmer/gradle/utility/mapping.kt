@@ -41,6 +41,11 @@ internal val kotlinTypeMappings = mutableMapOf(
     "bool" to Boolean::class.qualifiedName!!,
     "boolean" to Boolean::class.qualifiedName!!,
     "uuid" to UUID::class.qualifiedName!!,
+    "int2" to Short::class.qualifiedName!!,
+    "int4" to Int::class.qualifiedName!!,
+    "int8" to Long::class.qualifiedName!!,
+    "float4" to Float::class.qualifiedName!!,
+    "float8" to Double::class.qualifiedName!!,
 )
 
 internal val javaTypeMappings = mutableMapOf(
@@ -59,4 +64,9 @@ internal val javaTypeMappings = mutableMapOf(
     "bool" to java.lang.Boolean::class.java.name,
     "boolean" to java.lang.Boolean::class.java.name,
     "uuid" to UUID::class.java.name,
+    "int2" to java.lang.Short::class.java.name,
+    "int4" to java.lang.Integer::class.java.name,
+    "int8" to java.lang.Long::class.java.name,
+    "float4" to java.lang.Float::class.java.name,
+    "float8" to java.lang.Double::class.java.name,
 )
