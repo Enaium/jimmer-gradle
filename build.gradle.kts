@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.jimmer)
     implementation(libs.jackson)
     implementation(libs.jackson.kotlin)
+    implementation(libs.h2)
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.mariadb)
     testImplementation(libs.testcontainers.mysql)

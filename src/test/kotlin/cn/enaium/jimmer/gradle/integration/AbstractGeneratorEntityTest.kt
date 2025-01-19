@@ -16,6 +16,7 @@
 
 package cn.enaium.jimmer.gradle.integration
 
+import cn.enaium.jimmer.gradle.extension.Driver
 import cn.enaium.jimmer.gradle.extension.Language
 import cn.enaium.jimmer.gradle.util.ProjectTest
 import org.gradle.testkit.runner.BuildResult
@@ -25,9 +26,9 @@ import kotlin.test.assertEquals
 /**
  * @author Enaium
  */
-abstract class AbstractGeneratorEntityTest {
+abstract class AbstractGeneratorEntityTest(name: String = "generateEntity") {
 
-    private val projectTest = ProjectTest("generateEntity")
+    private val projectTest = ProjectTest(name)
 
     private val entities = listOf("Answer", "BaseEntity", "Comment", "People", "Post", "Profile", "Question", "Topic")
 
@@ -56,8 +57,8 @@ abstract class AbstractGeneratorEntityTest {
         url: String,
         username: String,
         password: String,
-        driver: String,
-        language: String,
+        driver: Driver,
+        language: Language,
         driverDependency: String
     ): BuildResult {
         return projectTest.create(
@@ -65,9 +66,21 @@ abstract class AbstractGeneratorEntityTest {
                 "url" to url,
                 "username" to username,
                 "password" to password,
-                "driver" to driver,
-                "language" to language,
+                "driver" to driver.name,
+                "language" to language.name,
                 "driverDependency" to driverDependency
+            )
+        )
+    }
+
+    fun create(
+        driver: Driver,
+        language: Language
+    ): BuildResult {
+        return projectTest.create(
+            "generateEntity", mapOf(
+                "driver" to driver.name,
+                "language" to language.name
             )
         )
     }

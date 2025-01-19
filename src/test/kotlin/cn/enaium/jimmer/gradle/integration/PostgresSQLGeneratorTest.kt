@@ -45,8 +45,8 @@ class PostgresSQLGeneratorTest : AbstractGeneratorEntityTest() {
             postgres.jdbcUrl,
             postgres.username,
             postgres.password,
-            Driver.POSTGRESQL.name,
-            language.name,
+            Driver.POSTGRESQL,
+            language,
             driverDependency
         )
     }

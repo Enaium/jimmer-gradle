@@ -56,19 +56,25 @@ open class GenerateEntityTask : DefaultTask() {
             javaTypeMappings.putAll(generator.table.typeMappings.get())
         }
 
-        val classloader = configurations.named("runtimeClasspath").get()
-            .find { file -> file.name.startsWith(generator.jdbc.driver.get().module) }
-            ?.let {
-                URLClassLoader(arrayOf(it.toURI().toURL()), this.javaClass.classLoader)
+        val driver =
+            generator.jdbc.driver.takeIf { it.isPresent }?.get() ?: throw RuntimeException("Driver not configured")
+        configurations.named("runtimeClasspath").get()
+            .find { file -> file.name.startsWith(driver.module) }
+            ?.also {
+                DriverManager.registerDriver(
+                    DiverWrapper(
+                        Class.forName(
+                            driver.className, true,
+                            URLClassLoader(arrayOf(it.toURI().toURL()), this.javaClass.classLoader)
+                        ).getConstructor()
+                            .newInstance() as Driver
+                    )
+                )
+            } ?: run {
+            if (!generator.jdbc.ddl.isPresent) {
+                throw RuntimeException("Failed to find driver module")
             }
-            ?: throw RuntimeException("Failed to find driver module")
-        DriverManager.registerDriver(
-            DiverWrapper(
-                Class.forName(generator.jdbc.driver.get().className, true, classloader).getConstructor()
-                    .newInstance() as Driver
-            )
-        )
-
+        }
         if (extension.language.get() == Language.KOTLIN) {
             KotlinEntityGenerateService().generate(projectDir, generator)
         } else if (extension.language.get() == Language.JAVA) {

@@ -10,6 +10,7 @@ mysql = "8.3.0"
 jimmer = "0.9.45"
 jetbrainsAnnotations = "24.1.0"
 jackson = "2.18.2"
+h2 = "2.3.232"
 
 [libraries]
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
@@ -25,6 +26,7 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
 mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

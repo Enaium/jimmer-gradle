@@ -42,7 +42,8 @@ class JavaEntityGenerateService : EntityGenerateService {
     override fun generate(projectDir: File, generator: Generator) {
         val idSuffix = "_${generator.table.primaryKey.get()}"
 
-        val metaData = getConnection(generator).metaData
+        val connect = getConnection(generator)
+        val metaData = connect.metaData
 
         val tables = metaData.getTables(
             catalog = generator.jdbc.catalog.orNull,
@@ -278,6 +279,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                 .build()
                 .writeTo(projectDir.resolve(generator.target.srcDir.get()))
         }
+        connect.close()
     }
 
     private fun getTypeName(typeMappings: Map<String, String>, column: Column): TypeName {

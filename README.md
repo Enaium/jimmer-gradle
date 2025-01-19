@@ -123,6 +123,7 @@ jimmer {
             url.set("jdbc:postgresql://localhost:5432/postgres")
             username.set("postgres")
             password.set("postgres")
+//            ddl.set(file("src/main/resources/schema.sql"))// if you set ddl, driver, url, username, password can be ignored
 //            catalog.set("postgres")
 //            schemaPattern.set("public")
 //            tableNamePattern.set("t_%")
@@ -287,6 +288,7 @@ jimmer {
 | `generator.jdbc.url`                | `String`                                             |                          | Database url.                               |
 | `generator.jdbc.username`           | `String`                                             |                          | Database username.                          |
 | `generator.jdbc.password`           | `String`                                             |                          | Database password.                          |
+| `generator.jdbc.ddl                 | `File`                                               |                          | DDL sql file.                               |
 | `generator.jdbc.catalog`            | `String`                                             |                          | Database catalog.                           |
 | `generator.jdbc.schemaPattern`      | `String`                                             |                          | Database schema pattern.                    |
 | `generator.jdbc.tableNamePattern`   | `String`                                             |                          | Database table name pattern.                |

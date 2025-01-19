@@ -31,11 +31,22 @@ interface EntityGenerateService {
     fun generate(projectDir: File, generator: Generator)
 
     fun getConnection(generator: Generator): Connection {
-        return DriverManager.getConnection(
-            generator.jdbc.url.get(),
-            generator.jdbc.username.get(),
-            generator.jdbc.password.get()
-        )
+        return generator.jdbc.ddl.orNull?.let { ddl ->
+            DriverManager.getConnection(
+                "jdbc:h2:mem:test;DATABASE_TO_LOWER=true;INIT=RUNSCRIPT FROM '${
+                    ddl.absolutePath.replace(
+                        "\\",
+                        "/"
+                    )
+                }'"
+            )
+        } ?: let {
+            DriverManager.getConnection(
+                generator.jdbc.url.get(),
+                generator.jdbc.username.get(),
+                generator.jdbc.password.get()
+            )
+        }
     }
 
     fun getCommonColumns(tables: Set<Table>): Set<Column> {

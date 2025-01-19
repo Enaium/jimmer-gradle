@@ -18,33 +18,18 @@ package cn.enaium.jimmer.gradle.integration
 
 import cn.enaium.jimmer.gradle.extension.Driver
 import cn.enaium.jimmer.gradle.extension.Language
-import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.Test
 
 /**
  * @author Enaium
  */
-class H2GeneratorTest : AbstractGeneratorEntityTest() {
-
-    private val driverDependency = "com.h2database:h2:2.3.232"
-
+class DDLGeneratorTest : AbstractGeneratorEntityTest("generateDDL") {
     @Test
-    fun generateEntity() {
-        val kotlin = create(language = Language.KOTLIN)
+    fun generateDDL() {
+        val kotlin = create(Driver.POSTGRESQL, Language.KOTLIN)
         assertGenerateTask(kotlin, Language.KOTLIN)
 
-        val java = create(language = Language.JAVA)
+        val java = create(Driver.POSTGRESQL, language = Language.JAVA)
         assertGenerateTask(java, Language.JAVA)
-    }
-
-    private fun create(language: Language): BuildResult {
-        return create(
-            "jdbc:h2:mem:test;DATABASE_TO_LOWER=true;INIT=RUNSCRIPT FROM 'src/test/resources/mariadb.sql'",
-            "",
-            "",
-            Driver.H2,
-            language,
-            driverDependency
-        )
     }
 }

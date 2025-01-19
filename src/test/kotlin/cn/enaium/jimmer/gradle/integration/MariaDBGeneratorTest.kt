@@ -45,8 +45,8 @@ class MariaDBGeneratorTest : AbstractGeneratorEntityTest() {
             mariadb.jdbcUrl,
             mariadb.username,
             mariadb.password,
-            Driver.MARIADB.name,
-            language.name,
+            Driver.MARIADB,
+            language,
             driverDependency
         )
     }
