@@ -56,23 +56,28 @@ open class GenerateEntityTask : DefaultTask() {
             javaTypeMappings.putAll(generator.table.typeMappings.get())
         }
 
-        val driver =
-            generator.jdbc.driver.takeIf { it.isPresent }?.get() ?: throw RuntimeException("Driver not configured")
-        configurations.named("runtimeClasspath").get()
-            .find { file -> file.name.startsWith(driver.module) }
-            ?.also {
-                DriverManager.registerDriver(
-                    DiverWrapper(
-                        Class.forName(
-                            driver.className, true,
-                            URLClassLoader(arrayOf(it.toURI().toURL()), this.javaClass.classLoader)
-                        ).getConstructor()
-                            .newInstance() as Driver
+        generator.jdbc.driver.takeIf { it.isPresent }?.also driver@{ driver ->
+            configurations.named("runtimeClasspath").get()
+                .find { file -> file.name.startsWith(driver.get().module) }
+                ?.also {
+                    generator.jdbc.ddl.isPresent && return@also
+                    DriverManager.registerDriver(
+                        DiverWrapper(
+                            Class.forName(
+                                driver.get().className, true,
+                                URLClassLoader(arrayOf(it.toURI().toURL()), this.javaClass.classLoader)
+                            ).getConstructor()
+                                .newInstance() as Driver
+                        )
                     )
-                )
-            } ?: run {
+                } ?: run {
+                if (!generator.jdbc.ddl.isPresent) {
+                    throw RuntimeException("Failed to find driver module")
+                }
+            }
+        } ?: run {
             if (!generator.jdbc.ddl.isPresent) {
-                throw RuntimeException("Failed to find driver module")
+                throw RuntimeException("Driver not configured")
             }
         }
         if (extension.language.get() == Language.KOTLIN) {

@@ -5,7 +5,7 @@
 
 ## Feature
 
-- Generate code for database table, column and association.
+- Generate code for table, column and association from database or ddl.
 - Incremental compile for dto language (apt/ksp).
 - Add implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
 - Add annotationProcessor/ksp for dependencies.
@@ -98,6 +98,8 @@ jimmer {
 ![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
 
+### From Database
+
 ```kotlin
 import cn.enaium.jimmer.gradle.extension.Association
 import cn.enaium.jimmer.gradle.extension.Driver
@@ -109,7 +111,7 @@ plugins {
 
 dependencies {
     //...
-    implementation("org.postgresql:postgresql:42.6.0")//require jdbc driver
+    runtimeOnly("org.postgresql:postgresql:42.6.0")//require jdbc driver
 }
 
 jimmer {
@@ -123,7 +125,6 @@ jimmer {
             url.set("jdbc:postgresql://localhost:5432/postgres")
             username.set("postgres")
             password.set("postgres")
-//            ddl.set(file("src/main/resources/schema.sql"))// if you set ddl, driver, url, username, password can be ignored
 //            catalog.set("postgres")
 //            schemaPattern.set("public")
 //            tableNamePattern.set("t_%")
@@ -138,6 +139,22 @@ jimmer {
                     "float8" to "kotlin.Float",
                 )
             )
+        }
+    }
+}
+```
+
+### From DDL
+
+```kotlin
+jimmer {
+    generator {
+        target {
+            srcDir.set("src/main/kotlin")
+            packageName.set("cn.enaium")
+        }
+        jdbc {
+            ddl.set(file("src/main/resources/schema.sql"))
         }
     }
 }

@@ -28,5 +28,5 @@ enum class Driver(val className: String, val module: String) {
     HYPERSONIC("org.hsqldb.jdbc.JDBCDriver", "hsqldb"),
     ORACLE("oracle.jdbc.driver.OracleDriver", "ojdbc"),
     DB2("com.ibm.db2.jcc.DB2Driver", "jcc"),
-    SQL_SERVER("com.microsoft.sqlserver.jdbc.SQLServerDriver", "mssql-jdbc"),
+    SQLSERVER("com.microsoft.sqlserver.jdbc.SQLServerDriver", "mssql-jdbc"),
 }
