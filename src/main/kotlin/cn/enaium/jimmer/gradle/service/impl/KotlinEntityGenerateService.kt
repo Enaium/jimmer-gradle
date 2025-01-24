@@ -132,6 +132,14 @@ class KotlinEntityGenerateService : EntityGenerateService {
                                 getTypeName(kotlinTypeMappings, column).copy(nullable = column.nullable)
                             )
 
+                            if (generator.table.column.get()) {
+                                propertyBuilder.addAnnotation(
+                                    AnnotationSpec.builder(org.babyfish.jimmer.sql.Column::class)
+                                        .addMember("name = %S", column.name)
+                                        .build()
+                                )
+                            }
+
                             if (generator.table.comment.get()) {
                                 column.remark?.let {
                                     propertyBuilder.addKdoc(it)
@@ -190,11 +198,14 @@ class KotlinEntityGenerateService : EntityGenerateService {
                 }
 
                 type.addAnnotation(Entity::class)
-                type.addAnnotation(
-                    AnnotationSpec.builder(Table::class)
-                        .addMember("name = %S", table.name)
-                        .build()
-                )
+                if (generator.table.name.get()) {
+                    type.addAnnotation(
+                        AnnotationSpec.builder(Table::class)
+                            .addMember("name = %S", table.name)
+                            .build()
+                    )
+                }
+                type
             }.let {
                 type2Builder[typeName] = it
             }

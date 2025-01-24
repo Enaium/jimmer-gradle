@@ -25,6 +25,8 @@ import javax.inject.Inject
  * @author Enaium
  */
 open class Table @Inject constructor(objects: ObjectFactory) {
+    val name: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val column: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val primaryKey: Property<String> = objects.property(String::class.java).convention("id")
     val association: Property<Association> = objects.property(Association::class.java).convention(Association.REAL)
     val typeMappings: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)

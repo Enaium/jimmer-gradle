@@ -132,6 +132,14 @@ class JavaEntityGenerateService : EntityGenerateService {
 
                             methodBuilder.returns(getTypeName(javaTypeMappings, column))
 
+                            if (generator.table.column.get()) {
+                                methodBuilder.addAnnotation(
+                                    AnnotationSpec.builder(org.babyfish.jimmer.sql.Column::class.java)
+                                        .addMember("name", "\$S", column.name)
+                                        .build()
+                                )
+                            }
+
                             if (generator.table.comment.get()) {
                                 column.remark?.let {
                                     methodBuilder.addJavadoc(it)
@@ -207,11 +215,14 @@ class JavaEntityGenerateService : EntityGenerateService {
                 }
                 type.addAnnotation(Entity::class.java)
                 type.addModifiers(Modifier.PUBLIC)
-                type.addAnnotation(
-                    AnnotationSpec.builder(Table::class.java)
-                        .addMember("name", "\$S", table.name)
-                        .build()
-                )
+                if (generator.table.name.get()) {
+                    type.addAnnotation(
+                        AnnotationSpec.builder(Table::class.java)
+                            .addMember("name", "\$S", table.name)
+                            .build()
+                    )
+                }
+                type
             }.let {
                 type2Builder[typeName] = it
             }
