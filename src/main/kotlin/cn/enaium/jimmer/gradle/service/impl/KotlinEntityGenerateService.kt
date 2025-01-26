@@ -67,6 +67,13 @@ class KotlinEntityGenerateService : EntityGenerateService {
                     )
                     if (column.name == generator.table.primaryKey.get()) {
                         propertyBuilder.addAnnotation(Id::class)
+                        generator.table.idGeneratorType.orNull?.also { idGeneratorType ->
+                            propertyBuilder.addAnnotation(
+                                AnnotationSpec.builder(GeneratedValue::class)
+                                    .addMember("generatorType = %T::class", ClassName.name(idGeneratorType))
+                                    .build()
+                            )
+                        }
                     }
                     propertyBuilder.build()
                 })
@@ -230,17 +237,26 @@ class KotlinEntityGenerateService : EntityGenerateService {
                         List::class.asTypeName().parameterizedBy(ClassName(packageName, inverseTypeName))
                     )
                         .addAnnotation(ManyToMany::class)
-                        .addAnnotation(
-                            AnnotationSpec.builder(JoinTable::class)
-                                .addMember("name = %S", table.name)
-                                .addMember("joinColumns = [%T(name = %S)]", JoinColumn::class, owningColumn.name)
-                                .addMember(
-                                    "inverseJoinColumns = [%T(name = %S)]",
-                                    JoinColumn::class,
-                                    inverseColumn.name
+                        .also {
+                            if (generator.table.joinTable.get()) {
+                                it.addAnnotation(
+                                    AnnotationSpec.builder(JoinTable::class)
+                                        .addMember("name = %S", table.name)
+                                        .addMember(
+                                            "joinColumns = [%T(name = %S)]",
+                                            JoinColumn::class,
+                                            owningColumn.name
+                                        )
+                                        .addMember(
+                                            "inverseJoinColumns = [%T(name = %S)]",
+                                            JoinColumn::class,
+                                            inverseColumn.name
+                                        )
+                                        .build()
                                 )
-                                .build()
-                        ).build()
+                            }
+                        }
+                        .build()
                 )
 
                 type2Builder[inverseTypeName]?.addProperty(

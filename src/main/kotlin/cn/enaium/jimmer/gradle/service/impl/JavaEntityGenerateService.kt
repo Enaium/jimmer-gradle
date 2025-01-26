@@ -67,6 +67,13 @@ class JavaEntityGenerateService : EntityGenerateService {
                         .returns(getTypeName(javaTypeMappings, column))
                     if (column.name == generator.table.primaryKey.get()) {
                         returns.addAnnotation(Id::class.java)
+                        generator.table.idGeneratorType.orNull?.also { idGeneratorType ->
+                            returns.addAnnotation(
+                                AnnotationSpec.builder(GeneratedValue::class.java)
+                                    .addMember("generatorType", "\$T.class", className(idGeneratorType))
+                                    .build()
+                            )
+                        }
                     }
                     returns.build()
                 })
@@ -250,20 +257,25 @@ class JavaEntityGenerateService : EntityGenerateService {
                             )
                         )
                         .addAnnotation(ManyToMany::class.java)
-                        .addAnnotation(
-                            AnnotationSpec.builder(JoinTable::class.java)
-                                .addMember("name", "\$S", table.name)
-                                .addMember(
-                                    "joinColumns", "\$L", AnnotationSpec.builder(JoinColumn::class.java)
-                                        .addMember("name", "\$S", owningColumn.name)
-                                        .build()
+                        .also {
+                            if (generator.table.joinTable.get()) {
+                                it.addAnnotation(
+                                    AnnotationSpec.builder(JoinTable::class.java)
+                                        .addMember("name", "\$S", table.name)
+                                        .addMember(
+                                            "joinColumns", "\$L", AnnotationSpec.builder(JoinColumn::class.java)
+                                                .addMember("name", "\$S", owningColumn.name)
+                                                .build()
+                                        )
+                                        .addMember(
+                                            "inverseJoinColumns", "\$L", AnnotationSpec.builder(JoinColumn::class.java)
+                                                .addMember("name", "\$S", inverseColumn.name)
+                                                .build()
+                                        ).build()
                                 )
-                                .addMember(
-                                    "inverseJoinColumns", "\$L", AnnotationSpec.builder(JoinColumn::class.java)
-                                        .addMember("name", "\$S", inverseColumn.name)
-                                        .build()
-                                ).build()
-                        ).build()
+                            }
+                        }
+                        .build()
                 )
 
                 type2Builder[inverseTypeName]?.addMethod(

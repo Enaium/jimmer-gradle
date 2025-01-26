@@ -16,6 +16,8 @@
 
 package cn.enaium.jimmer.gradle.utility
 
+import com.squareup.kotlinpoet.ClassName
+
 /**
  * @author Enaium
  */
@@ -26,4 +28,18 @@ internal fun hasClass(className: String): Boolean {
     } catch (e: ClassNotFoundException) {
         false
     }
+}
+
+internal fun ClassName.Companion.name(name: String): ClassName {
+    return ClassName(
+        name.substring(0, name.lastIndexOf(".")),
+        name.substring(name.lastIndexOf(".") + 1)
+    )
+}
+
+internal fun className(name: String): com.squareup.javapoet.ClassName {
+    return com.squareup.javapoet.ClassName.get(
+        name.substring(0, name.lastIndexOf(".")),
+        name.substring(name.lastIndexOf(".") + 1)
+    )
 }

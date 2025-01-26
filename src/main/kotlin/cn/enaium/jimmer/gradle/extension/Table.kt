@@ -32,4 +32,6 @@ open class Table @Inject constructor(objects: ObjectFactory) {
     val typeMappings: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
     val comment: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val idView: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val joinTable: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val idGeneratorType: Property<String?> = objects.property(String::class.java)
 }
