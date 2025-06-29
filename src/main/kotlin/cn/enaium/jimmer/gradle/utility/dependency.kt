@@ -23,11 +23,11 @@ import org.gradle.api.internal.tasks.JvmConstants
 /**
  * @author Enaium
  */
-internal fun DependencyHandler.implementation(dependency: String) {
+internal fun DependencyHandler.implementation(dependency: Any) {
     add(JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME, dependency)
 }
 
-internal fun DependencyHandler.annotationProcessor(dependency: String) {
+internal fun DependencyHandler.annotationProcessor(dependency: Any) {
     add(JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME, dependency)
 }
 

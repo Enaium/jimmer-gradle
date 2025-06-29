@@ -33,6 +33,8 @@ open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
     val language: Property<Language> = objects.property(Language::class.java)
     val version: Property<String> = objects.property(String::class.java).convention("latest.release")
     val keepIsPrefix: Property<Boolean> = objects.property(Boolean::class.java)
+    val autoImplDepend: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val patch: Patch = objects.newInstance(Patch::class.java)
 
     fun generator(action: Generator.() -> Unit) {
         action.invoke(generator)
@@ -52,6 +54,14 @@ open class JimmerExtension @Inject constructor(objects: ObjectFactory) {
 
     fun source(action: Source.() -> Unit) {
         action.invoke(source)
+    }
+
+    fun immutable(action: Immutable.() -> Unit) {
+        action.invoke(immutable)
+    }
+
+    fun patch(action: Patch.() -> Unit) {
+        action.invoke(patch)
     }
 }
 

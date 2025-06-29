@@ -7,16 +7,19 @@ testcontainers = "1.19.7"
 postgresql = "42.7.3"
 mariadb = "3.3.3"
 mysql = "8.3.0"
-jimmer = "0.9.45"
+jimmer = "0.9.94"
 jetbrainsAnnotations = "24.1.0"
 jackson = "2.18.2"
 h2 = "2.3.232"
+asm = "9.8"
 
 [libraries]
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
-jimmer = { module = "org.babyfish.jimmer:jimmer-core", version.ref = "jimmer" }
+jimmer = { module = "org.babyfish.jimmer:jimmer-sql-kotlin", version.ref = "jimmer" }
+jimmer-ksp = { module = "org.babyfish.jimmer:jimmer-ksp", version.ref = "jimmer" }
+jimmer-dto-compiler = { module = "org.babyfish.jimmer:jimmer-dto-compiler", version.ref = "jimmer" }
 jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
@@ -27,6 +30,8 @@ mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mari
 mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -12,14 +12,24 @@ repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain(8)
+}
+
 dependencies {
     implementation(libs.kotlinpoet)
     implementation(libs.javapoet)
     implementation(libs.jetbrainsAnnotations)
     implementation(libs.jimmer)
+    implementation(libs.jimmer.ksp)
+    implementation(libs.jimmer.dto.compiler)
     implementation(libs.jackson)
     implementation(libs.jackson.kotlin)
     implementation(libs.h2)
+
+    implementation(libs.asm)
+    implementation(libs.asm.tree)
+
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.mariadb)
     testImplementation(libs.testcontainers.mysql)

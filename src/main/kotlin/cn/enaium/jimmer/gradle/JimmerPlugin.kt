@@ -18,13 +18,13 @@ package cn.enaium.jimmer.gradle
 
 import cn.enaium.jimmer.gradle.extension.JimmerExtension
 import cn.enaium.jimmer.gradle.extension.Language
-import cn.enaium.jimmer.gradle.task.AllProjectDependencies
 import cn.enaium.jimmer.gradle.task.GenerateEntityTask
-import cn.enaium.jimmer.gradle.task.GenerateLspDependenciesTask
+import cn.enaium.jimmer.gradle.transform.AndroidTransform
 import cn.enaium.jimmer.gradle.utility.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE
 import org.gradle.api.internal.tasks.JvmConstants
 
 /**
@@ -44,13 +44,17 @@ class JimmerPlugin : Plugin<Project> {
             }
         }
 
+        val patch = project.configurations.register("patch") {
+            it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
+        }
+
+        project.dependencies.registerTransform(AndroidTransform::class.java) {
+            it.from.attribute(ARTIFACT_TYPE_ATTRIBUTE, "jar")
+            it.to.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
+        }
+
         project.afterEvaluate { afterProject ->
             val generateEntity = afterProject.tasks.register("generateEntity", GenerateEntityTask::class.java)
-            val generateLspDependencies =
-                afterProject.tasks.register("generateLspDependencies", GenerateLspDependenciesTask::class.java)
-            val allProjectDependencies =
-                afterProject.tasks.register("allProjectDependencies", AllProjectDependencies::class.java)
-
             if (extension.language.get() == Language.JAVA) {
                 afterProject.tasks.compileJava { compile ->
 
@@ -231,28 +235,37 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             // Add spring-boot-starter,sql,sql-kotlin
-            if (afterProject.plugins.hasSpringBoot && !afterProject.hasDependency(JIMMER_SPRINGBOOT_NAME)) {
-                afterProject.dependencies.implementation(
-                    "$JIMMER_GROUP:$JIMMER_SPRINGBOOT_NAME:${extension.version.get()}"
-                )
-            } else if (extension.language.get() == Language.JAVA && !afterProject.hasDependency(JIMMER_SQL_NAME)) {
-                afterProject.dependencies.implementation(
-                    "$JIMMER_GROUP:$JIMMER_SQL_NAME:${extension.version.get()}"
-                )
-            } else if (extension.language.get() == Language.KOTLIN
-                && !afterProject.hasDependency(JIMMER_SQL_KOTLIN_NAME)
-            ) {
-                afterProject.dependencies.implementation(
-                    "$JIMMER_GROUP:$JIMMER_SQL_KOTLIN_NAME:${extension.version.get()}"
-                )
+            extension.autoImplDepend.takeIf { it.get() }?.also {
+                if (afterProject.plugins.hasSpringBoot && !afterProject.hasDependency(JIMMER_SPRINGBOOT_NAME)) {
+                    afterProject.dependencies.implementation(
+                        "$JIMMER_GROUP:$JIMMER_SPRINGBOOT_NAME:${extension.version.get()}"
+                    )
+                } else if (extension.language.get() == Language.JAVA && !afterProject.hasDependency(JIMMER_SQL_NAME)) {
+                    afterProject.dependencies.implementation(
+                        "$JIMMER_GROUP:$JIMMER_SQL_NAME:${extension.version.get()}"
+                    )
+                } else if (extension.language.get() == Language.KOTLIN
+                    && !afterProject.hasDependency(JIMMER_SQL_KOTLIN_NAME)
+                ) {
+                    afterProject.dependencies.implementation(
+                        "$JIMMER_GROUP:$JIMMER_SQL_KOTLIN_NAME:${extension.version.get()}"
+                    )
+                }
+
+                if (extension.language.get() == Language.JAVA
+                    && !afterProject.hasDependency(
+                        JIMMER_APT_NAME,
+                        JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME
+                    )
+                ) {
+                    afterProject.dependencies.annotationProcessor(
+                        "$JIMMER_GROUP:$JIMMER_APT_NAME:${extension.version.get()}"
+                    )
+                }
             }
 
-            if (extension.language.get() == Language.JAVA
-                && !afterProject.hasDependency(JIMMER_APT_NAME, JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME)
-            ) {
-                afterProject.dependencies.annotationProcessor(
-                    "$JIMMER_GROUP:$JIMMER_APT_NAME:${extension.version.get()}"
-                )
+            extension.patch.enable.takeIf { it.get() }?.also {
+                project.dependencies.implementation(project.files(patch))
             }
         }
 
