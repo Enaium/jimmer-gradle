@@ -48,6 +48,14 @@ class JimmerPlugin : Plugin<Project> {
             it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
         }
 
+        val patchKsp = project.configurations.register("patchKsp") {
+            it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
+        }
+
+        val patchApt = project.configurations.register("patchApt") {
+            it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
+        }
+
         project.dependencies.registerTransform(AndroidTransform::class.java) {
             it.from.attribute(ARTIFACT_TYPE_ATTRIBUTE, "jar")
             it.to.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
@@ -266,6 +274,7 @@ class JimmerPlugin : Plugin<Project> {
 
             extension.patch.enable.takeIf { it.get() }?.also {
                 project.dependencies.implementation(project.files(patch))
+                project.dependencies.annotationProcessor(project.files(patchApt))
             }
         }
 

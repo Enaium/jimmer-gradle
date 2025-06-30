@@ -31,7 +31,7 @@ internal fun DependencyHandler.annotationProcessor(dependency: Any) {
     add(JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME, dependency)
 }
 
-internal fun DependencyHandler.ksp(dependency: String) {
+internal fun DependencyHandler.ksp(dependency: Any) {
     add("ksp", dependency)
 }
 

@@ -300,9 +300,13 @@ jimmer {
 }
 
 dependencies {
-    patch(jimmers.sqlKotlin)
-    patch(jimmers.ksp)
-    ksp(files(configurations.patch.get()))
+    patch(jimmers.sqlKotlin) {
+        exclude(module = "kotlin-stdlib")
+        exclude(module = "annotations")
+        exclude(module = "validation-api")
+    }
+    patchKsp(jimmers.ksp)
+    ksp(files(configurations.patchKsp.get()))
 }
 ```
 
