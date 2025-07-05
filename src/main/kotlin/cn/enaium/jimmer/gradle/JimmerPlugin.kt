@@ -259,6 +259,11 @@ class JimmerPlugin : Plugin<Project> {
                         "$JIMMER_GROUP:$JIMMER_SQL_KOTLIN_NAME:${extension.version.get()}"
                     )
                 }
+                if (afterProject.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
+                    afterProject.dependencies.ksp(
+                        "$JIMMER_GROUP:$JIMMER_KSP_NAME:${extension.version.get()}"
+                    )
+                }
 
                 if (extension.language.get() == Language.JAVA
                     && !afterProject.hasDependency(
@@ -273,17 +278,14 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             extension.patch.enable.takeIf { it.get() }?.also {
-                project.dependencies.implementation(project.files(patch))
-                project.dependencies.annotationProcessor(project.files(patchApt))
+                afterProject.dependencies.implementation(afterProject.files(patch))
+                afterProject.dependencies.annotationProcessor(afterProject.files(patchApt))
             }
         }
 
-        if (project.plugins.hasKsp && extension.language.get() == Language.KOTLIN
-            && hasClass("com.google.devtools.ksp.gradle.KspExtension")
-        ) {
-            project.dependencies.ksp(
-                "$JIMMER_GROUP:$JIMMER_KSP_NAME:${extension.version.get()}"
-            )
+
+        if (project.plugins.hasKsp && extension.language.get() == Language.KOTLIN) {
+            project.dependencies.ksp(project.files(patchKsp))
         }
     }
 

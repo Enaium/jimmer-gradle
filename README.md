@@ -3,23 +3,49 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/enaium/jimmer-gradle?style=flat-square&logo=kotlin)
 ![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/cn.enaium.jimmer.gradle?style=flat-square&logo=gradle)
 
-## Feature
+A Gradle plugin for [Jimmer](https://github.com/babyfish-ct/jimmer) that generates code from your database or DDL,
+supports incremental compilation, and simplifies dependency management for both Java and Kotlin projects.
 
-- Generate code for table, column and association from database or ddl.
-- Incremental compile for dto language (apt/ksp).
-- Add implementation (spring-boot-start/sql/sql-kotlin) for dependencies.
-- Add annotationProcessor/ksp for dependencies.
-- Easy to add arguments for annotationProcessor/ksp.
-- Can use jimmer's catalog in the project.
-- Let jimmer generate code when opening the project for the first time.
+---
 
-## Usage(Recommended Method 2)
+## Table of Contents
 
-Warning: You cannot use the method 1 and method 2 at the same time.
+- [Features](#features)
+- [Quick Start](#quick-start)
+    - [Method 1: Gradle Project Plugin](#method-1-gradle-project-plugin)
+    - [Method 2: Gradle Settings Plugin (Recommended)](#method-2-gradle-settings-plugin-recommended)
+- [Jimmer Version Configuration](#jimmer-version-configuration)
+- [Entity Generation](#entity-generation)
+    - [From Database](#from-database)
+    - [From DDL](#from-ddl)
+    - [Association Handling](#association-handling)
+    - [Type Mappings](#type-mappings)
+- [Incremental DTO Compilation](#incremental-dto-compilation)
+- [Dependency Management](#dependency-management)
+- [Annotation Processor / KSP Arguments](#annotation-processor--ksp-arguments)
+- [Patch Support](#patch-support)
+- [Extension Reference](#extension-reference)
 
-### Gradle Project Plugin(Method 1)
+---
 
-In the `build.gradle.kts` file, you can use the following code to apply the plugin.
+## Features
+
+- Generate code for tables, columns, and associations from a database or DDL.
+- Incremental compilation for DTOs (APT/KSP).
+- Automatic dependency management (Spring Boot, SQL, SQL-Kotlin).
+- Easy configuration for annotationProcessor/KSP arguments.
+- Use Jimmer's catalog in your project.
+- Auto-generate code on first project open.
+
+---
+
+## Quick Start
+
+> **Note:** Do not use Method 1 and Method 2 at the same time.
+
+### Method 1: Gradle Project Plugin
+
+Add to your `build.gradle.kts`:
 
 ```kotlin
 plugins {
@@ -27,19 +53,33 @@ plugins {
 }
 ```
 
-If you also used kotlin, you need to declare the ksp plugin before the jimmer plugin.
+If using Kotlin, declare the KSP plugin before the Jimmer plugin:
 
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.21"
     id("com.google.devtools.ksp") version "2.0.21+"
-    id("cn.enaium.jimmer.gradle") version "latest.release"
+    id("cn.enaium.jimmer.gradle") version "latest.release"// Must declare after the ksp plugin
 }
 ```
 
-### Gradle Settings Plugin(Method 2)
+Enable auto dependency implementation:
 
-In the `settings.gradle.kts` file, you can use the following code to apply the plugin.
+```kotlin
+jimmer {
+    autoImplDepend = true
+}
+
+dependencies {
+    ksp("org.babyfish.jimmer:jimmer-ksp:x.x.x")// Not auto
+}
+```
+
+---
+
+### Method 2: Gradle Settings Plugin (Recommended)
+
+Add to your `settings.gradle.kts`:
 
 ```kotlin
 plugins {
@@ -47,7 +87,7 @@ plugins {
 }
 ```
 
-If you want to modify the extension of the gradle project plugin, then you can use the gradle project plugin.
+To modify the extension, use the project plugin as well:
 
 ```kotlin
 plugins {
@@ -55,17 +95,17 @@ plugins {
 }
 ```
 
-If you also used kotlin, you need to declare the ksp plugin before the jimmer plugin.
+If using Kotlin, declare the KSP plugin before the Jimmer plugin:
 
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.21"
     alias(jimmers.plugins.ksp) version "2.0.21+"
-    alias(jimmers.plugins.jimmer)
+    alias(jimmers.plugins.jimmer)// Must declare after the ksp plugin
 }
 ```
 
-then you need to add the ksp dependency in the `build.gradle.kts` file.
+Add the KSP dependency in `build.gradle.kts`:
 
 ```kotlin
 dependencies {
@@ -73,30 +113,21 @@ dependencies {
 }
 ```
 
-## Jimmer's Version(Both Gradle Project Plugin and Gradle Settings Plugin)
+---
 
-Warning: The version of the extension is not supported for `ksp` when
-issue [#1789](https://github.com/google/ksp/issues/1789) isn't fixed, but you can use the latest version or use the
-gradle setting
-plugin.
+## Jimmer Version Configuration
 
-In the `build.gradle.kts` file if you use the gradle project plugin, or in the `settings.gradle.kts` file if you use the
-gradle settings plugin, you can use the following code to set the version of jimmer.
+Set the Jimmer version in your `build.gradle.kts` (for project plugin) or `settings.gradle.kts` (for settings plugin):
 
 ```kotlin
 jimmer {
-    version.set("latest.release")//default latest
+    version.set("latest.release") // default is latest
 }
 ```
 
-## Generate Entity(Only Gradle Project Plugin)
+---
 
-![Static Badge](https://img.shields.io/badge/-Kotlin-gray?style=flat-square&logo=kotlin&logoColor=white)
-![Static Badge](https://img.shields.io/badge/-Java-gray?style=flat-square&logo=openjdk&logoColor=white)
-
-![Static Badge](https://img.shields.io/badge/-PostgreSQL-gray?style=flat-square&logo=postgresql&logoColor=white)
-![Static Badge](https://img.shields.io/badge/-MariaDB-gray?style=flat-square&logo=mariadb&logoColor=white)
-![Static Badge](https://img.shields.io/badge/-MySQL-gray?style=flat-square&logo=mysql&logoColor=white)
+## Entity Generation
 
 ### From Database
 
@@ -105,13 +136,13 @@ import cn.enaium.jimmer.gradle.extension.Association
 import cn.enaium.jimmer.gradle.extension.Driver
 
 plugins {
-    //...
+    // ...
     id("cn.enaium.jimmer.gradle") version "<version>"
 }
 
 dependencies {
-    //...
-    runtimeOnly("org.postgresql:postgresql:42.6.0")//require jdbc driver
+    // ...
+    runtimeOnly("org.postgresql:postgresql:42.6.0") // JDBC driver required
 }
 
 jimmer {
@@ -121,24 +152,18 @@ jimmer {
             packageName.set("cn.enaium")
         }
         jdbc {
-            driver.set(Driver.POSTGRESQL)//Driver.POSTGRESQL,Driver.MARIADB,Driver.MYSQL, no default
+            driver.set(Driver.POSTGRESQL) // POSTGRESQL, MARIADB, MYSQL
             url.set("jdbc:postgresql://localhost:5432/postgres")
             username.set("postgres")
             password.set("postgres")
-//            catalog.set("postgres")
-//            schemaPattern.set("public")
-//            tableNamePattern.set("t_%")
+            // Optional: catalog, schemaPattern, tableNamePattern
         }
         table {
             idView.set(true)
             comment.set(true)
-            primaryKey.set("id")//default id
-            association.set(Association.REAL)//Association.REAL,Association.FAKE,Association.NO, default Association.REAL
-            typeMappings.set(
-                mapOf(
-                    "float8" to "kotlin.Float",
-                )
-            )
+            primaryKey.set("id") // default is "id"
+            association.set(Association.REAL) // REAL, FAKE, NO
+            typeMappings.set(mapOf("float8" to "kotlin.Float"))
         }
     }
 }
@@ -160,73 +185,51 @@ jimmer {
 }
 ```
 
-### Association(Only Gradle Project Plugin)
+### Association Handling
 
-You must add the suffix '_id'(`primaryKey.set("id")`) to the column name if the column is a fake foreign key, otherwise
-the column cannot be recognized as a foreign key.
+- Use the `_id` suffix for fake foreign keys (e.g., `user_id`).
+- Set `association.set(Association.FAKE)` for fake associations, `Association.REAL` for real, or `Association.NO` to
+  disable.
+- **Warning:** Do not mix fake and real associations in the same database.
 
-If you want to use the fake foreign key, you need to set the `association.set(Association.FAKE)`, otherwise the default
-is `association.set(Association.REAL)`, of course you can also set `association.set(Association.NO)` to disable the
-association.
+### Type Mappings
 
-**Warning: You can't use the fake association if you included the real association in the database.**
-
-```kotlin
-jimmer {
-    generator {
-        table {
-            primaryKey.set("id")
-            association.set(Association.REAL)
-        }
-    }
-}
-```
-
-### typeMappings(Only Gradle Project Plugin)
-
-[default](src/main/kotlin/cn/enaium/jimmer/gradle/utility/mapping.kt)
-
-You can customize the type mapping, the default is as follows:
+Default mappings are in [`mapping.kt`](src/main/kotlin/cn/enaium/jimmer/gradle/utility/mapping.kt). You can override
+them:
 
 ```kotlin
 jimmer {
     generator {
         table {
-            typeMappings.set(
-                mapOf(
-                    "float8" to "kotlin.Float",//Java: "java.lang.Float"
-                )
-            )
+            typeMappings.set(mapOf("float8" to "kotlin.Float")) // Java: "java.lang.Float"
         }
     }
 }
 ```
 
-## Dto Incremental Compile
+---
 
-Open the dto file and press `Ctrl + F9` to compile the dto file.
+## Incremental DTO Compilation
 
-## implementation for dependencies
+Open a DTO file and press `Ctrl + F9` to compile it incrementally.
 
-### spring-boot-start
+---
+
+## Dependency Management
+
+### Spring Boot Starter
 
 ```kotlin
 plugins {
-    id("org.springframework.boot")//require
+    id("org.springframework.boot") // required
 }
-```
 
-It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
-
-```kotlin
 dependencies {
     implementation(jimmers.springBootStart)
 }
 ```
 
-### sql-kotlin
-
-It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+### SQL-Kotlin
 
 ```kotlin
 dependencies {
@@ -234,9 +237,7 @@ dependencies {
 }
 ```
 
-### sql
-
-It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+### SQL
 
 ```kotlin
 dependencies {
@@ -244,35 +245,24 @@ dependencies {
 }
 ```
 
-## annotationProcessor/ksp for dependencies
+---
 
-### ksp
+## Annotation Processor / KSP Arguments
 
-It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
-
-```kotlin
-plugins {
-    kotlin("jvm") version "2.0.21"
-    id("com.google.devtools.ksp") version "2.0.21+" //require and must declare before jimmer gradle plugin
-}
-```
+### KSP
 
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.21"
-    alias(jimmers.plugins.ksp) version "2.0.21+"
+    id("com.google.devtools.ksp") version "2.0.21+" // must be before jimmer plugin
 }
-```
 
-```kotlin
 dependencies {
     ksp(jimmers.ksp)
 }
 ```
 
-### annotationProcessor
-
-It will automatically add or use the catalog of jimmer if you use the gradle settings plugin.
+### Annotation Processor
 
 ```kotlin
 dependencies {
@@ -280,17 +270,19 @@ dependencies {
 }
 ```
 
-## annotationProcessor/ksp arguments(Only Gradle Project Plugin)
+### Arguments (Project Plugin Only)
 
 ```kotlin
 jimmer {
     entry {
-        objects.set("Drafts")//equal to -Ajimmer.entry.objects=Drafts
+        objects.set("Drafts") // equals -Ajimmer.entry.objects=Drafts
     }
 }
 ```
 
-## Patch
+---
+
+## Patch Support
 
 ```kotlin
 jimmer {
@@ -306,61 +298,64 @@ dependencies {
         exclude(module = "validation-api")
     }
     patchKsp(jimmers.ksp)
-    ksp(files(configurations.patchKsp.get()))
 }
 ```
 
-## Gradle Project Plugin Extension
+---
 
-| extension                           | type                                                 | default          | description                                                                        |
-|-------------------------------------|------------------------------------------------------|------------------|------------------------------------------------------------------------------------|
-| `version`                           | `String`                                             | `latest.release` | Jimmer version.                                                                    |
-| `keepIsPrefix`                      | `Boolean`                                            | `false`          | Keep 'is' prefix in getter method.                                                 |
-| `autoImplDepend`                    | `Boolean`                                            | `false`          | Add jimmer-sql-kotlin or jimmer-sql dependencies automatically.                    |
-| `generator`                         | `cn.enaium.jimmer.gradle.extension.Generator`        |                  | Entity generator.                                                                  |
-| `generator.target`                  | `cn.enaium.jimmer.gradle.extension.Target`           |                  | Entity generator target.                                                           |
-| `generator.target.srcDir`           | `String`                                             |                  | Entity generator target src dir.                                                   |
-| `generator.target.packageName`      | `String`                                             |                  | Entity generator target package.                                                   |
-| `generator.jdbc`                    | `cn.enaium.jimmer.gradle.extension.Jdbc`             |                  | For database connection.                                                           |
-| `generator.jdbc.driver`             | `cn.enaium.jimmer.gradle.extension.Driver`           |                  | Database driver.                                                                   |
-| `generator.jdbc.url`                | `String`                                             |                  | Database url.                                                                      |
-| `generator.jdbc.username`           | `String`                                             |                  | Database username.                                                                 |
-| `generator.jdbc.password`           | `String`                                             |                  | Database password.                                                                 |
-| `generator.jdbc.ddl`                | `File`                                               |                  | DDL sql file.                                                                      |
-| `generator.jdbc.catalog`            | `String`                                             |                  | Database catalog.                                                                  |
-| `generator.jdbc.schemaPattern`      | `String`                                             |                  | Database schema pattern.                                                           |
-| `generator.jdbc.tableNamePattern`   | `String`                                             |                  | Database table name pattern.                                                       |
-| `generator.table`                   | `cn.enaium.jimmer.gradle.extension.Table`            |                  | Table rule.                                                                        |
-| `generator.table.name`              | `Boolean`                                            | `false`          | Add table annotation.                                                              |
-| `generator.table.column`            | `Boolean`                                            | `false`          | Add column annotation.                                                             |
-| `generator.table.primaryKey`        | `String`                                             | `id`             | Table primary key name.                                                            |
-| `generator.table.asociation`        | `cn.enaium.jimmer.gradle.extension.Association`      | `REAL`           | Table association rule.                                                            |
-| `generator.table.typeMappings`      | `Map<String, String>`                                |                  | Column type mapping.                                                               |
-| `generator.table.comment`           | `Boolean`                                            | `false`          | Generate table comment.                                                            |
-| `generator.table.idView`            | `Boolean`                                            | `false`          | Generate id view annotation.                                                       |
-| `generator.table.joinTable`         | `Boolean`                                            | `false`          | Generate join table annotation.                                                    |
-| `generator.table.idGeneratorType`   | `String`                                             |                  | Generate generated value annotation that has generator type.                       |
-| `generator.poet`                    | `cn.enaium.jimmer.gradle.extension.Poet`             |                  | Poet rule.                                                                         |
-| `generator.poet.indent`             | `String`                                             | Four spaces      | Poet indent.                                                                       |
-| `client.checkedExceptions`          | `Boolean`                                            |                  |                                                                                    |
-| `client.ignoreJdkWarning`           | `Boolean`                                            |                  | Java only.                                                                         |
-| `dto.dirs`                          | `List<String>`                                       |                  |                                                                                    |
-| `dto.testDirs`                      | `List<String>`                                       |                  |                                                                                    |
-| `dto.mutable`                       | `Boolean`                                            |                  | Kotlin only.                                                                       |
-| `dto.defaultNullableInputModifier`  | `cn.enaium.jimmer.gradle.extension.InputDtoModifier` |                  |                                                                                    |
-| `dto.hibernateValidatorEnhancement` | `Boolean`                                            |                  | Java only.                                                                         |
-| `entry`                             | `cn.enaium.jimmer.gradle.extension.Entry`            |                  | Java only.                                                                         |
-| `entry.objects`                     | `String`                                             |                  | Generate `objects` class name, java only.                                          |
-| `entry.tables`                      | `String`                                             |                  | Generate `tables` class name, java only.                                           |
-| `entry.tableExes`                   | `String`                                             |                  | Generate `tableExes` class name, java only.                                        |
-| `entry.fetchers`                    | `String`                                             |                  | Generate `fetchers` class name, java only.                                         |
-| `immutable.isModuleRequired`        | `Boolean`                                            |                  | Kotlin only.                                                                       |
-| `source.includes`                   | `List<String>`                                       |                  | Java only.                                                                         |
-| `source.excludes`                   | `List<String>`                                       |                  | Java only.                                                                         |
-| `patch.enable`                      | `Boolean`                                            | `false`          | Provide a patch that makes some dependencies of the Jimmer compatible with Android |
+## Extension Reference
 
-## Gradle Settings Plugin Extension
+### Gradle Project Plugin Extension
 
-| extension | type     | default          | description     |
-|-----------|----------|------------------|-----------------|
-| `version` | `String` | `latest.release` | Jimmer version. |
+| Extension                           | Type                  | Default          | Description                     |
+|-------------------------------------|-----------------------|------------------|---------------------------------|
+| `version`                           | `String`              | `latest.release` | Jimmer version                  |
+| `keepIsPrefix`                      | `Boolean`             | `false`          | Keep 'is' prefix in getter      |
+| `autoImplDepend`                    | `Boolean`             | `false`          | Auto-add jimmer-sql-kotlin/sql  |
+| `generator`                         | `Generator`           |                  | Entity generator                |
+| `generator.target`                  | `Target`              |                  | Generation target               |
+| `generator.target.srcDir`           | `String`              |                  | Target src dir                  |
+| `generator.target.packageName`      | `String`              |                  | Target package                  |
+| `generator.jdbc`                    | `Jdbc`                |                  | DB connection                   |
+| `generator.jdbc.driver`             | `Driver`              |                  | DB driver                       |
+| `generator.jdbc.url`                | `String`              |                  | DB URL                          |
+| `generator.jdbc.username`           | `String`              |                  | DB username                     |
+| `generator.jdbc.password`           | `String`              |                  | DB password                     |
+| `generator.jdbc.ddl`                | `File`                |                  | DDL file                        |
+| `generator.jdbc.catalog`            | `String`              |                  | DB catalog                      |
+| `generator.jdbc.schemaPattern`      | `String`              |                  | DB schema pattern               |
+| `generator.jdbc.tableNamePattern`   | `String`              |                  | DB table name pattern           |
+| `generator.table`                   | `Table`               |                  | Table rule                      |
+| `generator.table.name`              | `Boolean`             | `false`          | Add table annotation            |
+| `generator.table.column`            | `Boolean`             | `false`          | Add column annotation           |
+| `generator.table.primaryKey`        | `String`              | `id`             | Table PK name                   |
+| `generator.table.association`       | `Association`         | `REAL`           | Association rule                |
+| `generator.table.typeMappings`      | `Map<String, String>` |                  | Column type mapping             |
+| `generator.table.comment`           | `Boolean`             | `false`          | Generate table comment          |
+| `generator.table.idView`            | `Boolean`             | `false`          | Generate id view annotation     |
+| `generator.table.joinTable`         | `Boolean`             | `false`          | Generate join table annotation  |
+| `generator.table.idGeneratorType`   | `String`              |                  | Generator type annotation       |
+| `generator.poet`                    | `Poet`                |                  | Poet rule                       |
+| `generator.poet.indent`             | `String`              | Four spaces      | Poet indent                     |
+| `client.checkedExceptions`          | `Boolean`             |                  |                                 |
+| `client.ignoreJdkWarning`           | `Boolean`             |                  | Java only                       |
+| `dto.dirs`                          | `List<String>`        |                  |                                 |
+| `dto.testDirs`                      | `List<String>`        |                  |                                 |
+| `dto.mutable`                       | `Boolean`             |                  | Kotlin only                     |
+| `dto.defaultNullableInputModifier`  | `InputDtoModifier`    |                  |                                 |
+| `dto.hibernateValidatorEnhancement` | `Boolean`             |                  | Java only                       |
+| `entry`                             | `Entry`               |                  | Java only                       |
+| `entry.objects`                     | `String`              |                  | `objects` class name            |
+| `entry.tables`                      | `String`              |                  | `tables` class name             |
+| `entry.tableExes`                   | `String`              |                  | `tableExes` class name          |
+| `entry.fetchers`                    | `String`              |                  | `fetchers` class name           |
+| `immutable.isModuleRequired`        | `Boolean`             |                  | Kotlin only                     |
+| `source.includes`                   | `List<String>`        |                  | Java only                       |
+| `source.excludes`                   | `List<String>`        |                  | Java only                       |
+| `patch.enable`                      | `Boolean`             | `false`          | Patch for Android compatibility |
+
+### Gradle Settings Plugin Extension
+
+| Extension | Type     | Default          | Description    |
+|-----------|----------|------------------|----------------|
+| `version` | `String` | `latest.release` | Jimmer version |

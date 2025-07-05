@@ -51,7 +51,7 @@ fun jarClass(input: File, output: File, transform: (name: String, bytes: ByteArr
 
 fun ByteArray.cv(cv: (cw: ClassWriter) -> ClassVisitor): ByteArray {
     val cr = ClassReader(this)
-    val cw = ClassWriter(cr, ClassWriter.COMPUTE_FRAMES)
+    val cw = ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
     cr.accept(cv(cw), 0)
     return cw.toByteArray()
 }
@@ -60,7 +60,7 @@ fun ByteArray.cn(cn: (cn: ClassNode) -> ClassNode): ByteArray {
     val cr = ClassReader(this)
     val cn = ClassNode()
     cr.accept(cn, 0)
-    val cw = ClassWriter(ClassWriter.COMPUTE_FRAMES)
+    val cw = ClassWriter(ClassWriter.COMPUTE_MAXS)
     cn(cn).accept(cw)
     return cw.toByteArray()
 }

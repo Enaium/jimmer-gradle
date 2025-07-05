@@ -27,10 +27,7 @@ import org.gradle.api.artifacts.transform.TransformOutputs
 import org.gradle.api.artifacts.transform.TransformParameters
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.Opcodes
+import org.objectweb.asm.*
 import org.objectweb.asm.tree.*
 
 /**
@@ -78,6 +75,35 @@ abstract class AndroidTransform : TransformAction<TransformParameters.None> {
                             name
                         }
                         return super.visitMethod(access, name, descriptor, signature, exceptions)
+                    }
+
+                    override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? {
+                        val av = super.visitAnnotation(descriptor, visible)
+                        return if (className == "org/babyfish/jimmer/sql/kt/ast/expression/KPredicatesKt" && descriptor == "Lkotlin/Metadata;") {
+                            object : AnnotationVisitor(Opcodes.ASM9, av) {
+                                override fun visitArray(name: String): AnnotationVisitor {
+                                    val va = super.visitArray(name)
+                                    return if (name == "d2") {
+                                        object : AnnotationVisitor(Opcodes.ASM9, va) {
+                                            override fun visit(name: String?, value: Any) {
+                                                val value = value as String
+                                                super.visit(
+                                                    name, if (value.endsWith("?")) {
+                                                        value.replace("?", "If")
+                                                    } else {
+                                                        value
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        va
+                                    }
+                                }
+                            }
+                        } else {
+                            av
+                        }
                     }
                 }
             }.cn { cn ->
