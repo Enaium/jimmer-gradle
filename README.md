@@ -292,11 +292,7 @@ jimmer {
 }
 
 dependencies {
-    patch(jimmers.sqlKotlin) {
-        exclude(module = "kotlin-stdlib")
-        exclude(module = "annotations")
-        exclude(module = "validation-api")
-    }
+    patch(jimmers.sqlKotlin)
     patchKsp(jimmers.ksp)
 }
 ```

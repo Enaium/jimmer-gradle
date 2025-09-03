@@ -44,15 +44,15 @@ class JimmerPlugin : Plugin<Project> {
             }
         }
 
-        val patch = project.configurations.register("patch") {
+        val patch = project.configurations.create("patch") {
             it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
         }
 
-        val patchKsp = project.configurations.register("patchKsp") {
+        val patchKsp = project.configurations.create("patchKsp") {
             it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
         }
 
-        val patchApt = project.configurations.register("patchApt") {
+        val patchApt = project.configurations.create("patchApt") {
             it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
         }
 
@@ -62,7 +62,7 @@ class JimmerPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate { afterProject ->
-            val generateEntity = afterProject.tasks.register("generateEntity", GenerateEntityTask::class.java)
+            afterProject.tasks.register("generateEntity", GenerateEntityTask::class.java)
             if (extension.language.get() == Language.JAVA) {
                 afterProject.tasks.compileJava { compile ->
 
@@ -278,7 +278,20 @@ class JimmerPlugin : Plugin<Project> {
             }
 
             extension.patch.enable.takeIf { it.get() }?.also {
-                afterProject.dependencies.implementation(afterProject.files(patch))
+
+                patch.files.forEach {
+                    afterProject.dependencies.add(
+                        extension.patch.configuration.get(),
+                        if (it.name.endsWith("-transformed.jar")) {
+                            afterProject.files(it)
+                        } else {
+                            val group = it.parentFile.parentFile.parentFile.parentFile.name
+                            val artifact = it.parentFile.parentFile.parentFile.name
+                            val version = it.parentFile.parentFile.name
+                            afterProject.dependencies.create("$group:$artifact:$version")
+                        }
+                    )
+                }
                 afterProject.dependencies.annotationProcessor(afterProject.files(patchApt))
             }
         }

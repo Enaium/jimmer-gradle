@@ -1,7 +1,7 @@
 [versions]
-kotlin = "2.1.0"
+kotlin = "2.2.10"
 publishing = "1.2.1"
-kotlinpoet = "2.0.0"
+kotlinpoet = "2.2.0"
 javapoet = "1.13.0"
 testcontainers = "1.19.7"
 postgresql = "42.7.3"

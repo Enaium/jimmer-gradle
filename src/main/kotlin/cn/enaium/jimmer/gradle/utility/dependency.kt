@@ -27,6 +27,10 @@ internal fun DependencyHandler.implementation(dependency: Any) {
     add(JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME, dependency)
 }
 
+internal fun DependencyHandler.api(dependency: Any) {
+    add(JvmConstants.API_CONFIGURATION_NAME, dependency)
+}
+
 internal fun DependencyHandler.annotationProcessor(dependency: Any) {
     add(JvmConstants.ANNOTATION_PROCESSOR_CONFIGURATION_NAME, dependency)
 }

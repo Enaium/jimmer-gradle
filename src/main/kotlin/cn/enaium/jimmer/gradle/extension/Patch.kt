@@ -16,6 +16,7 @@
 
 package cn.enaium.jimmer.gradle.extension
 
+import org.gradle.api.internal.tasks.JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import javax.inject.Inject
@@ -25,4 +26,6 @@ import javax.inject.Inject
  */
 open class Patch @Inject constructor(objects: ObjectFactory) {
     val enable: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val configuration: Property<String> =
+        objects.property(String::class.java).convention(IMPLEMENTATION_CONFIGURATION_NAME)
 }

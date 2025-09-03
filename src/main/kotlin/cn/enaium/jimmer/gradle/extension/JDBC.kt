@@ -29,8 +29,8 @@ open class JDBC @Inject constructor(objects: ObjectFactory) {
     val url: Property<String> = objects.property(String::class.java)
     val username: Property<String> = objects.property(String::class.java)
     val password: Property<String> = objects.property(String::class.java)
-    val ddl: Property<File?> = objects.property(File::class.java)
-    val catalog: Property<String?> = objects.property(String::class.java)
-    val schemaPattern: Property<String?> = objects.property(String::class.java)
-    val tableNamePattern: Property<String?> = objects.property(String::class.java)
+    val ddl: Property<File> = objects.property(File::class.java)
+    val catalog: Property<String> = objects.property(String::class.java)
+    val schemaPattern: Property<String> = objects.property(String::class.java)
+    val tableNamePattern: Property<String> = objects.property(String::class.java)
 }
