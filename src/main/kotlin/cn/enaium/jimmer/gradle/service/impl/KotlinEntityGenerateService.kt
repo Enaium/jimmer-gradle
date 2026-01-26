@@ -153,7 +153,16 @@ class KotlinEntityGenerateService : EntityGenerateService {
                                 }
                             }
 
-                            if (column.name.endsWith(idSuffix, true)) {
+                            if (column.name == generator.table.primaryKey.get()) {
+                                propertyBuilder.addAnnotation(Id::class)
+                                generator.table.idGeneratorType.orNull?.also { idGeneratorType ->
+                                    propertyBuilder.addAnnotation(
+                                        AnnotationSpec.builder(GeneratedValue::class)
+                                            .addMember("generatorType = %T::class", ClassName.name(idGeneratorType))
+                                            .build()
+                                    )
+                                }
+                            } else if (column.name.endsWith(idSuffix, true)) {
                                 propertyBuilder.addAnnotation(IdView::class)
                             }
                             propertyBuilder.build()
