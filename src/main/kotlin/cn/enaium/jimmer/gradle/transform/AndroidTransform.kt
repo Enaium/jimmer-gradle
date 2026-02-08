@@ -26,21 +26,30 @@ import org.gradle.api.artifacts.transform.TransformAction
 import org.gradle.api.artifacts.transform.TransformOutputs
 import org.gradle.api.artifacts.transform.TransformParameters
 import org.gradle.api.file.FileSystemLocation
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
 import org.objectweb.asm.*
 import org.objectweb.asm.tree.*
 
 /**
  * @author Enaium
  */
-abstract class AndroidTransform : TransformAction<TransformParameters.None> {
+abstract class AndroidTransform : TransformAction<AndroidTransform.Parameters> {
+
+    abstract class Parameters : TransformParameters {
+        @get:Input
+        abstract val nullableMark: Property<String>
+    }
+
     @get:InputArtifact
     abstract val inputArtifact: Provider<FileSystemLocation>
 
     override fun transform(outputs: TransformOutputs) {
+        val nullableMark: String = parameters.nullableMark.get()
         val inputFile = inputArtifact.get().asFile
-        if (!listOf("jimmer-sql", "jimmer-sql-kotlin", "jimmer-ksp").any { inputFile.name.contains(it) }) {
-            outputs.file(inputFile)
+        if (!listOf("jimmer-sql-kotlin", "jimmer-ksp").any { inputFile.name.contains(it) }) {
+            outputs.file(inputArtifact)
             return
         }
         val outputFile = outputs.file(inputFile.name.replace(".jar", "-transformed.jar"))
@@ -70,7 +79,7 @@ abstract class AndroidTransform : TransformAction<TransformParameters.None> {
                         exceptions: Array<String>?
                     ): MethodVisitor? {
                         val name = if (className == "org/babyfish/jimmer/sql/kt/ast/expression/KPredicatesKt") {
-                            name.replace("?", "If")
+                            name.replace("?", nullableMark)
                         } else {
                             name
                         }
@@ -89,7 +98,7 @@ abstract class AndroidTransform : TransformAction<TransformParameters.None> {
                                                 val value = value as String
                                                 super.visit(
                                                     name, if (value.endsWith("?")) {
-                                                        value.replace("?", "If")
+                                                        value.replace("?", nullableMark)
                                                     } else {
                                                         value
                                                     }
@@ -125,7 +134,7 @@ abstract class AndroidTransform : TransformAction<TransformParameters.None> {
                             .find { it.opcode == Opcodes.BIPUSH && it.operand == '?'.code }
                             ?: return@also
                         val plusStr = InsnList()
-                        plusStr.add(LdcInsnNode("If"))
+                        plusStr.add(LdcInsnNode(nullableMark))
                         plusStr.add(
                             MethodInsnNode(
                                 Opcodes.INVOKEVIRTUAL,

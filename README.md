@@ -303,52 +303,54 @@ dependencies {
 
 ### Gradle Project Plugin Extension
 
-| Extension                           | Type                  | Default          | Description                     |
-|-------------------------------------|-----------------------|------------------|---------------------------------|
-| `version`                           | `String`              | `latest.release` | Jimmer version                  |
-| `keepIsPrefix`                      | `Boolean`             | `false`          | Keep 'is' prefix in getter      |
-| `autoImplDepend`                    | `Boolean`             | `false`          | Auto-add jimmer-sql-kotlin/sql  |
-| `generator`                         | `Generator`           |                  | Entity generator                |
-| `generator.target`                  | `Target`              |                  | Generation target               |
-| `generator.target.srcDir`           | `String`              |                  | Target src dir                  |
-| `generator.target.packageName`      | `String`              |                  | Target package                  |
-| `generator.jdbc`                    | `Jdbc`                |                  | DB connection                   |
-| `generator.jdbc.driver`             | `Driver`              |                  | DB driver                       |
-| `generator.jdbc.url`                | `String`              |                  | DB URL                          |
-| `generator.jdbc.username`           | `String`              |                  | DB username                     |
-| `generator.jdbc.password`           | `String`              |                  | DB password                     |
-| `generator.jdbc.ddl`                | `File`                |                  | DDL file                        |
-| `generator.jdbc.catalog`            | `String`              |                  | DB catalog                      |
-| `generator.jdbc.schemaPattern`      | `String`              |                  | DB schema pattern               |
-| `generator.jdbc.tableNamePattern`   | `String`              |                  | DB table name pattern           |
-| `generator.table`                   | `Table`               |                  | Table rule                      |
-| `generator.table.name`              | `Boolean`             | `false`          | Add table annotation            |
-| `generator.table.column`            | `Boolean`             | `false`          | Add column annotation           |
-| `generator.table.primaryKey`        | `String`              | `id`             | Table PK name                   |
-| `generator.table.association`       | `Association`         | `REAL`           | Association rule                |
-| `generator.table.typeMappings`      | `Map<String, String>` |                  | Column type mapping             |
-| `generator.table.comment`           | `Boolean`             | `false`          | Generate table comment          |
-| `generator.table.idView`            | `Boolean`             | `false`          | Generate id view annotation     |
-| `generator.table.joinTable`         | `Boolean`             | `false`          | Generate join table annotation  |
-| `generator.table.idGeneratorType`   | `String`              |                  | Generator type annotation       |
-| `generator.poet`                    | `Poet`                |                  | Poet rule                       |
-| `generator.poet.indent`             | `String`              | Four spaces      | Poet indent                     |
-| `client.checkedExceptions`          | `Boolean`             |                  |                                 |
-| `client.ignoreJdkWarning`           | `Boolean`             |                  | Java only                       |
-| `dto.dirs`                          | `List<String>`        |                  |                                 |
-| `dto.testDirs`                      | `List<String>`        |                  |                                 |
-| `dto.mutable`                       | `Boolean`             |                  | Kotlin only                     |
-| `dto.defaultNullableInputModifier`  | `InputDtoModifier`    |                  |                                 |
-| `dto.hibernateValidatorEnhancement` | `Boolean`             |                  | Java only                       |
-| `entry`                             | `Entry`               |                  | Java only                       |
-| `entry.objects`                     | `String`              |                  | `objects` class name            |
-| `entry.tables`                      | `String`              |                  | `tables` class name             |
-| `entry.tableExes`                   | `String`              |                  | `tableExes` class name          |
-| `entry.fetchers`                    | `String`              |                  | `fetchers` class name           |
-| `immutable.isModuleRequired`        | `Boolean`             |                  | Kotlin only                     |
-| `source.includes`                   | `List<String>`        |                  | Java only                       |
-| `source.excludes`                   | `List<String>`        |                  | Java only                       |
-| `patch.enable`                      | `Boolean`             | `false`          | Patch for Android compatibility |
+| Extension                           | Type                  | Default          | Description                                             |
+|-------------------------------------|-----------------------|------------------|---------------------------------------------------------|
+| `version`                           | `String`              | `latest.release` | Jimmer version                                          |
+| `keepIsPrefix`                      | `Boolean`             | `false`          | Keep 'is' prefix in getter                              |
+| `autoImplDepend`                    | `Boolean`             | `false`          | Auto-add jimmer-sql-kotlin/sql                          |
+| `generator`                         | `Generator`           |                  | Entity generator                                        |
+| `generator.target`                  | `Target`              |                  | Generation target                                       |
+| `generator.target.srcDir`           | `String`              |                  | Target src dir                                          |
+| `generator.target.packageName`      | `String`              |                  | Target package                                          |
+| `generator.jdbc`                    | `Jdbc`                |                  | DB connection                                           |
+| `generator.jdbc.driver`             | `Driver`              |                  | DB driver                                               |
+| `generator.jdbc.url`                | `String`              |                  | DB URL                                                  |
+| `generator.jdbc.username`           | `String`              |                  | DB username                                             |
+| `generator.jdbc.password`           | `String`              |                  | DB password                                             |
+| `generator.jdbc.ddl`                | `File`                |                  | DDL file                                                |
+| `generator.jdbc.catalog`            | `String`              |                  | DB catalog                                              |
+| `generator.jdbc.schemaPattern`      | `String`              |                  | DB schema pattern                                       |
+| `generator.jdbc.tableNamePattern`   | `String`              |                  | DB table name pattern                                   |
+| `generator.table`                   | `Table`               |                  | Table rule                                              |
+| `generator.table.name`              | `Boolean`             | `false`          | Add table annotation                                    |
+| `generator.table.column`            | `Boolean`             | `false`          | Add column annotation                                   |
+| `generator.table.primaryKey`        | `String`              | `id`             | Table PK name                                           |
+| `generator.table.association`       | `Association`         | `REAL`           | Association rule                                        |
+| `generator.table.typeMappings`      | `Map<String, String>` |                  | Column type mapping                                     |
+| `generator.table.comment`           | `Boolean`             | `false`          | Generate table comment                                  |
+| `generator.table.idView`            | `Boolean`             | `false`          | Generate id view annotation                             |
+| `generator.table.joinTable`         | `Boolean`             | `false`          | Generate join table annotation                          |
+| `generator.table.idGeneratorType`   | `String`              |                  | Generator type annotation                               |
+| `generator.poet`                    | `Poet`                |                  | Poet rule                                               |
+| `generator.poet.indent`             | `String`              | Four spaces      | Poet indent                                             |
+| `client.checkedExceptions`          | `Boolean`             |                  |                                                         |
+| `client.ignoreJdkWarning`           | `Boolean`             |                  | Java only                                               |
+| `dto.dirs`                          | `List<String>`        |                  |                                                         |
+| `dto.testDirs`                      | `List<String>`        |                  |                                                         |
+| `dto.mutable`                       | `Boolean`             |                  | Kotlin only                                             |
+| `dto.defaultNullableInputModifier`  | `InputDtoModifier`    |                  |                                                         |
+| `dto.hibernateValidatorEnhancement` | `Boolean`             |                  | Java only                                               |
+| `entry`                             | `Entry`               |                  | Java only                                               |
+| `entry.objects`                     | `String`              |                  | `objects` class name                                    |
+| `entry.tables`                      | `String`              |                  | `tables` class name                                     |
+| `entry.tableExes`                   | `String`              |                  | `tableExes` class name                                  |
+| `entry.fetchers`                    | `String`              |                  | `fetchers` class name                                   |
+| `immutable.isModuleRequired`        | `Boolean`             |                  | Kotlin only                                             |
+| `source.includes`                   | `List<String>`        |                  | Java only                                               |
+| `source.excludes`                   | `List<String>`        |                  | Java only                                               |
+| `patch.enable`                      | `Boolean`             | `false`          | Patch for Android compatibility                         |
+| `patch.nullableMark`                | `String`              | `N`              | Replace ? with 'N'                                      |
+| `patch.configuration`               | `String`              | `implementation` | Add the transformed dependencies to this configuration. |
 
 ### Gradle Settings Plugin Extension
 

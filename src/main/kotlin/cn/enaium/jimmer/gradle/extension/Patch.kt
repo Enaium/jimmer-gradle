@@ -26,6 +26,7 @@ import javax.inject.Inject
  */
 open class Patch @Inject constructor(objects: ObjectFactory) {
     val enable: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val nullableMark: Property<String> = objects.property(String::class.java).convention("N")
     val configuration: Property<String> =
         objects.property(String::class.java).convention(IMPLEMENTATION_CONFIGURATION_NAME)
 }

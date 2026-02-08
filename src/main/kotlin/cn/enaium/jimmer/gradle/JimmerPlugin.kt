@@ -56,9 +56,12 @@ class JimmerPlugin : Plugin<Project> {
             it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
         }
 
-        project.dependencies.registerTransform(AndroidTransform::class.java) {
-            it.from.attribute(ARTIFACT_TYPE_ATTRIBUTE, "jar")
-            it.to.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
+        project.dependencies.registerTransform(AndroidTransform::class.java) { transform ->
+            transform.parameters { parameters ->
+                parameters.nullableMark.set(extension.patch.nullableMark.get())
+            }
+            transform.from.attribute(ARTIFACT_TYPE_ATTRIBUTE, "jar")
+            transform.to.attribute(ARTIFACT_TYPE_ATTRIBUTE, "transformed-jar")
         }
 
         project.afterEvaluate { afterProject ->
@@ -277,8 +280,7 @@ class JimmerPlugin : Plugin<Project> {
                 }
             }
 
-            extension.patch.enable.takeIf { it.get() }?.also {
-
+            extension.patch.enable.takeIf { it.isPresent }?.also {
                 patch.files.forEach {
                     afterProject.dependencies.add(
                         extension.patch.configuration.get(),

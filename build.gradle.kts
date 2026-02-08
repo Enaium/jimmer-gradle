@@ -24,7 +24,6 @@ dependencies {
     implementation(libs.jimmer.ksp)
     implementation(libs.jimmer.dto.compiler)
     implementation(libs.jackson)
-    implementation(libs.jackson.kotlin)
     implementation(libs.h2)
 
     implementation(libs.asm)
