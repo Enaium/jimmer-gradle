@@ -19,7 +19,7 @@ kotlin {
 dependencies {
     implementation(libs.kotlinpoet)
     implementation(libs.javapoet)
-    implementation(libs.jetbrainsAnnotations)
+    implementation(libs.jspecify)
     implementation(libs.jimmer)
     implementation(libs.jimmer.ksp)
     implementation(libs.jimmer.dto.compiler)

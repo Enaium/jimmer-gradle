@@ -7,12 +7,8 @@ import org.babyfish.jimmer.sql.Entity;
 import org.babyfish.jimmer.sql.IdView;
 import org.babyfish.jimmer.sql.ManyToOne;
 import org.babyfish.jimmer.sql.OneToMany;
-import org.babyfish.jimmer.sql.Table;
 
 @Entity
-@Table(
-        name = "answer"
-)
 public interface Answer extends BaseEntity {
     String content();
 

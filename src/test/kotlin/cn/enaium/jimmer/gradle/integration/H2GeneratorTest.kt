@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
  */
 class H2GeneratorTest : AbstractGeneratorEntityTest() {
 
-    private val driverDependency = "com.h2database:h2:2.3.232"
+    private val driverDependency = "com.h2database:h2:2.4.240"
 
     @Test
     fun generateEntity() {

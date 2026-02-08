@@ -1,22 +1,22 @@
 [versions]
-kotlin = "2.2.10"
-publishing = "1.2.1"
+kotlin = "2.3.10"
+publishing = "2.0.0"
 kotlinpoet = "2.2.0"
 javapoet = "1.13.0"
-testcontainers = "1.19.7"
-postgresql = "42.7.3"
-mariadb = "3.3.3"
-mysql = "8.3.0"
-jimmer = "0.9.94"
-jetbrainsAnnotations = "24.1.0"
-jackson = "2.18.2"
-h2 = "2.3.232"
-asm = "9.8"
+testcontainers = "1.21.4"
+postgresql = "42.7.9"
+mariadb = "3.5.7"
+mysql = "9.6.0"
+jimmer = "0.10.6"
+jspecify = "1.0.0"
+jackson = "2.21.0"
+h2 = "2.4.240"
+asm = "9.9.1"
 
 [libraries]
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
-jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jimmer = { module = "org.babyfish.jimmer:jimmer-sql-kotlin", version.ref = "jimmer" }
 jimmer-ksp = { module = "org.babyfish.jimmer:jimmer-ksp", version.ref = "jimmer" }
 jimmer-dto-compiler = { module = "org.babyfish.jimmer:jimmer-dto-compiler", version.ref = "jimmer" }

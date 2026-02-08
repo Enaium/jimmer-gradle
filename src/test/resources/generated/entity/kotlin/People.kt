@@ -5,10 +5,8 @@ import kotlin.collections.List
 import org.babyfish.jimmer.sql.Entity
 import org.babyfish.jimmer.sql.OneToMany
 import org.babyfish.jimmer.sql.OneToOne
-import org.babyfish.jimmer.sql.Table
 
 @Entity
-@Table(name = "people")
 public interface People : BaseEntity {
     public val phone: String
 

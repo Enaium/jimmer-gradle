@@ -5,13 +5,9 @@ import java.util.UUID;
 import org.babyfish.jimmer.sql.Entity;
 import org.babyfish.jimmer.sql.IdView;
 import org.babyfish.jimmer.sql.ManyToOne;
-import org.babyfish.jimmer.sql.Table;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Entity
-@Table(
-        name = "comment"
-)
 public interface Comment extends BaseEntity {
     String content();
 

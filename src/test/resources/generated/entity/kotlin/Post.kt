@@ -5,14 +5,10 @@ import kotlin.String
 import kotlin.collections.List
 import org.babyfish.jimmer.sql.Entity
 import org.babyfish.jimmer.sql.IdView
-import org.babyfish.jimmer.sql.JoinColumn
-import org.babyfish.jimmer.sql.JoinTable
 import org.babyfish.jimmer.sql.ManyToMany
 import org.babyfish.jimmer.sql.ManyToOne
-import org.babyfish.jimmer.sql.Table
 
 @Entity
-@Table(name = "post")
 public interface Post : BaseEntity {
     public val title: String
 
@@ -25,10 +21,5 @@ public interface Post : BaseEntity {
     public val people: People
 
     @ManyToMany
-    @JoinTable(
-        name = "post_topic",
-        joinColumns = [JoinColumn(name = "post_id")],
-        inverseJoinColumns = [JoinColumn(name = "topic_id")],
-    )
     public val topics: List<Topic>
 }

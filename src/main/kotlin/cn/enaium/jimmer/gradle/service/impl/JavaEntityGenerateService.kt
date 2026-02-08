@@ -25,7 +25,7 @@ import cn.enaium.jimmer.gradle.service.EntityGenerateService
 import cn.enaium.jimmer.gradle.utility.*
 import com.squareup.javapoet.*
 import org.babyfish.jimmer.sql.*
-import org.jetbrains.annotations.Nullable
+import org.jspecify.annotations.Nullable
 import java.io.File
 import java.util.*
 import javax.lang.model.element.Modifier
@@ -70,7 +70,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                         generator.table.idGeneratorType.orNull?.also { idGeneratorType ->
                             returns.addAnnotation(
                                 AnnotationSpec.builder(GeneratedValue::class.java)
-                                    .addMember("generatorType", "\$T.class", className(idGeneratorType))
+                                    .addMember("generatorType", $$"$T.class", className(idGeneratorType))
                                     .build()
                             )
                         }
@@ -142,7 +142,7 @@ class JavaEntityGenerateService : EntityGenerateService {
                             if (generator.table.column.get()) {
                                 methodBuilder.addAnnotation(
                                     AnnotationSpec.builder(org.babyfish.jimmer.sql.Column::class.java)
-                                        .addMember("name", "\$S", column.name)
+                                        .addMember("name", $$"$S", column.name)
                                         .build()
                                 )
                             }
@@ -153,8 +153,19 @@ class JavaEntityGenerateService : EntityGenerateService {
                                 }
                             }
 
-                            if (column.name.endsWith(idSuffix, true)) {
-                                methodBuilder.addAnnotation(IdView::class.java)
+                            if (column.name == generator.table.primaryKey.get()) {
+                                methodBuilder.addAnnotation(Id::class.java)
+                                generator.table.idGeneratorType.orNull?.also { idGeneratorType ->
+                                    methodBuilder.addAnnotation(
+                                        AnnotationSpec.builder(GeneratedValue::class.java)
+                                            .addMember("generatorType", $$"$T.class", className(idGeneratorType))
+                                            .build()
+                                    )
+                                }
+                            } else {
+                                if (column.name.endsWith(idSuffix, true)) {
+                                    methodBuilder.addAnnotation(IdView::class.java)
+                                }
                             }
 
                             if (column.nullable) {
@@ -221,14 +232,14 @@ class JavaEntityGenerateService : EntityGenerateService {
                     })
                 }
                 type.addAnnotation(Entity::class.java)
-                type.addModifiers(Modifier.PUBLIC)
                 if (generator.table.name.get()) {
                     type.addAnnotation(
                         AnnotationSpec.builder(Table::class.java)
-                            .addMember("name", "\$S", table.name)
+                            .addMember("name", $$"$S", table.name)
                             .build()
                     )
                 }
+                type.addModifiers(Modifier.PUBLIC)
                 type
             }.let {
                 type2Builder[typeName] = it
