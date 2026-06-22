@@ -48,7 +48,7 @@ abstract class AndroidTransform : TransformAction<AndroidTransform.Parameters> {
     override fun transform(outputs: TransformOutputs) {
         val nullableMark: String = parameters.nullableMark.get()
         val inputFile = inputArtifact.get().asFile
-        if (!listOf("jimmer-sql-kotlin", "jimmer-ksp").any { inputFile.name.contains(it) }) {
+        if (!listOf("jimmer-sql", "jimmer-sql-kotlin", "jimmer-ksp").any { inputFile.name.contains(it) }) {
             outputs.file(inputArtifact)
             return
         }

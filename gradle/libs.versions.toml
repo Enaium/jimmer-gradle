@@ -1,17 +1,17 @@
 [versions]
-kotlin = "2.3.10"
+kotlin = "2.4.0"
 publishing = "2.0.0"
-kotlinpoet = "2.2.0"
+kotlinpoet = "2.3.0"
 javapoet = "1.13.0"
 testcontainers = "1.21.4"
 postgresql = "42.7.9"
 mariadb = "3.5.7"
 mysql = "9.6.0"
-jimmer = "0.10.6"
+jimmer = "0.10.11"
 jspecify = "1.0.0"
-jackson = "2.21.0"
+jackson = "2.22.0"
 h2 = "2.4.240"
-asm = "9.9.1"
+asm = "9.10.1"
 
 [libraries]
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
